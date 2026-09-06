@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ชุดสาธิตวงจรทรานซิสเตอร์สวิตซ์ | Transistor Switch Lab Simulator</title>
-    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,8 +11,17 @@
             theme: {
                 extend: {
                     colors: {
-                        slate: { 850: '#0f172a', 950: '#020617' },
-                        tech: { accent: '#06b6d4', purple: '#a855f7' }
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
+                        },
+                        tech: {
+                            accent: '#06b6d4',
+                            active: '#10b981',
+                            alert: '#f59e0b',
+                            danger: '#ef4444',
+                            purple: '#a855f7'
+                        }
                     },
                     fontFamily: {
                         sans: ['Sarabun', 'sans-serif'],
@@ -26,16 +34,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
         body {
             font-family: 'Sarabun', sans-serif;
-            background: #020617; /* Solid fallback */
             background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0f172a 60%, #020617 100%);
             color: #f1f5f9;
         }
 
-        /* Multimeter & DSO Screens */
         .lcd-display {
             font-family: 'JetBrains Mono', monospace;
             background: #142217;
@@ -44,77 +49,117 @@
             border: 2px solid #1e3a24;
             box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(74, 222, 128, 0.15);
         }
+
         .dso-screen {
             background-color: #030a16;
-            background-image: linear-gradient(rgba(14, 165, 233, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(14, 165, 233, 0.12) 1px, transparent 1px);
+            background-image: 
+                linear-gradient(rgba(14, 165, 233, 0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(14, 165, 233, 0.12) 1px, transparent 1px);
             background-size: 25px 25px;
             box-shadow: inset 0 0 25px rgba(0,0,0,0.95);
         }
 
-        /* Hardware Board */
         .hardware-panel {
             background: linear-gradient(145deg, #f8fafc 0%, #edf2f7 50%, #e2e8f0 100%);
-            border: 8px solid #94a3b8;
+            border: 6px solid #94a3b8;
             border-radius: 16px;
-            box-shadow: inset 0 2px 6px rgba(255,255,255,0.8), inset 0 -4px 10px rgba(0,0,0,0.2), 0 20px 40px -10px rgba(0,0,0,0.6), 0 0 0 2px #334155;
+            box-shadow: 
+                inset 0 2px 6px rgba(255,255,255,0.8),
+                inset 0 -4px 10px rgba(0,0,0,0.2),
+                0 20px 40px -10px rgba(0,0,0,0.6),
+                0 0 0 2px #334155;
             position: relative;
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 768px) {
             .hardware-panel { border-width: 10px; }
         }
 
-        /* Metal Corners */
-        .metal-corner { position: absolute; width: 28px; height: 28px; border-color: #64748b; z-index: 10; }
+        .metal-corner {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-color: #64748b;
+            z-index: 10;
+        }
         .metal-corner::after {
-            content: ''; position: absolute; width: 8px; height: 8px; border-radius: 50%;
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #e2e8f0, #475569);
             box-shadow: 1px 1px 2px rgba(0,0,0,0.4);
         }
-        .corner-tl { top: 6px; left: 6px; border-top: 3px solid #64748b; border-left: 3px solid #64748b; } .corner-tl::after { top: 3px; left: 3px; }
-        .corner-tr { top: 6px; right: 6px; border-top: 3px solid #64748b; border-right: 3px solid #64748b; } .corner-tr::after { top: 3px; right: 3px; }
-        .corner-bl { bottom: 6px; left: 6px; border-bottom: 3px solid #64748b; border-left: 3px solid #64748b; } .corner-bl::after { bottom: 3px; left: 3px; }
-        .corner-br { bottom: 6px; right: 6px; border-bottom: 3px solid #64748b; border-right: 3px solid #64748b; } .corner-br::after { bottom: 3px; right: 3px; }
+        .corner-tl { top: 6px; left: 6px; border-top: 3px solid #64748b; border-left: 3px solid #64748b; }
+        .corner-tl::after { top: 3px; left: 3px; }
+        .corner-tr { top: 6px; right: 6px; border-top: 3px solid #64748b; border-right: 3px solid #64748b; }
+        .corner-tr::after { top: 3px; right: 3px; }
+        .corner-bl { bottom: 6px; left: 6px; border-bottom: 3px solid #64748b; border-left: 3px solid #64748b; }
+        .corner-bl::after { bottom: 3px; left: 3px; }
+        .corner-br { bottom: 6px; right: 6px; border-bottom: 3px solid #64748b; border-right: 3px solid #64748b; }
+        .corner-br::after { bottom: 3px; right: 3px; }
 
-        /* SVG Wiring & Paths */
-        .wire { stroke: #0f172a; stroke-width: 3.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .wire {
+            stroke: #0f172a;
+            stroke-width: 3.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
         .wire-red { stroke: #dc2626; filter: drop-shadow(0 0 1px rgba(220, 38, 38, 0.4)); }
         .wire-black { stroke: #0f172a; }
         .wire-purple { stroke: #7e22ce; }
 
-        /* Animations */
-        @keyframes flowBase { 0% { offset-distance: 0%; } 100% { offset-distance: 100%; } }
-        @keyframes flowBasePulse { 0% { offset-distance: 0%; } 100% { offset-distance: 100%; } }
-        @keyframes flowCollector { 0% { offset-distance: 0%; } 100% { offset-distance: 100%; } }
-        
-        .flow-path-b {
-            offset-path: path('M 170 80 L 170 240 L 250 240 L 340 300 L 420 300 L 520 300 L 550 300 L 610 300 L 670 300 L 705 330 L 705 480 L 80 480 L 80 80 L 170 80');
-            animation: flowBase 3s linear infinite;
+        .electron {
+            fill: #ef4444;
+            r: 5;
+            filter: drop-shadow(0 0 5px #ef4444);
         }
-        .flow-path-b-pulse {
-            offset-path: path('M 270 450 L 190 450 L 190 360 L 250 360 L 341 300 L 420 300 L 520 300 L 550 300 L 610 300 L 670 300 L 705 330 L 705 480 L 335 480 L 335 450 L 270 450');
-            animation: flowBasePulse 2.6s linear infinite;
+        .electron-pulse {
+            fill: #a855f7;
+            r: 5;
+            filter: drop-shadow(0 0 6px #c084fc);
         }
-        .flow-path-c {
-            offset-path: path('M 180 80 L 600 80 L 720 80 L 800 80 L 800 160 L 800 240 L 800 270 L 705 270 L 705 330 L 705 480 L 80 480 L 80 80 L 180 80');
-            animation: flowCollector 2.8s linear infinite;
+        .electron-pulse-c {
+            fill: #fbbf24;
+            r: 5;
+            filter: drop-shadow(0 0 6px #f59e0b);
         }
 
-        .electron { fill: #ef4444; r: 5; filter: drop-shadow(0 0 5px #ef4444); }
-        .electron-pulse { fill: #a855f7; r: 5; filter: drop-shadow(0 0 6px #c084fc); }
-        .electron-pulse-c { fill: #fbbf24; r: 5; filter: drop-shadow(0 0 6px #f59e0b); }
+        .probe-drop { 
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease; 
+        }
 
-        /* Probes & Switch */
-        .probe-drop { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease; }
-        .switch-toggle { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), x2 0.3s ease, y2 0.3s ease; }
+        .hotspot {
+            fill: rgba(6, 182, 212, 0.08);
+            stroke: #0284c7;
+            stroke-width: 1.5;
+            stroke-dasharray: 5,4;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .hotspot:hover {
+            fill: rgba(6, 182, 212, 0.28);
+            stroke: #0284c7;
+            stroke-width: 2.5;
+        }
 
         .led-off { fill: #991b1b; opacity: 0.38; }
-        .led-on { fill: #ef4444; opacity: 1; filter: drop-shadow(0 0 12px #ef4444) drop-shadow(0 0 28px #ef4444); }
+        .led-on { 
+            fill: #ef4444; 
+            opacity: 1; 
+            filter: drop-shadow(0 0 12px #ef4444) drop-shadow(0 0 28px #ef4444);
+        }
 
-        .hotspot { fill: rgba(6, 182, 212, 0.08); stroke: #0284c7; stroke-width: 1.5; stroke-dasharray: 5,4; cursor: pointer; transition: all 0.25s ease; }
-        .hotspot:hover { fill: rgba(6, 182, 212, 0.28); stroke-width: 2.5; }
+        .switch-toggle {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), x2 0.3s ease, y2 0.3s ease;
+        }
 
-        /* RGB Capsule Badge */
-        @keyframes rgbFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes rgbFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
         @keyframes rgbBorderGlow {
             0% { border-color: rgba(236, 72, 153, 0.5); box-shadow: 0 0 14px rgba(236, 72, 153, 0.25); }
             33% { border-color: rgba(59, 130, 246, 0.6); box-shadow: 0 0 14px rgba(59, 130, 246, 0.25); }
@@ -123,26 +168,31 @@
         }
         .rgb-text {
             background: linear-gradient(90deg, #ec4899, #a855f7, #3b82f6, #06b6d4, #22c55e, #ec4899);
-            background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: rgbFlow 4s linear infinite; font-weight: 800;
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rgbFlow 4s linear infinite;
+            font-weight: 800;
         }
         .rgb-pill {
-            background: rgba(10, 15, 29, 0.85); border: 1px solid rgba(99, 102, 241, 0.35);
-            animation: rgbBorderGlow 5s ease-in-out infinite; transition: all 0.25s ease;
+            background: rgba(10, 15, 29, 0.85);
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            animation: rgbBorderGlow 5s ease-in-out infinite;
+            transition: all 0.25s ease;
         }
-        .rgb-pill:hover { transform: translateY(-1px) scale(1.02); box-shadow: 0 0 22px rgba(6, 182, 212, 0.45); }
+        .rgb-pill:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 0 22px rgba(6, 182, 212, 0.45);
+        }
 
-        /* Scrollbars */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-
 <body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 lg:h-screen lg:overflow-hidden">
 
-    <!-- Header Section -->
     <header class="bg-slate-900/95 backdrop-blur border-b border-slate-800 shrink-0 z-30 shadow-lg px-4 py-3">
         <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center space-x-3 w-full sm:w-auto">
@@ -168,290 +218,9 @@
         </div>
     </header>
 
-    <!-- Main Workspace (Responsive Split) -->
     <main class="flex-1 flex flex-col lg:flex-row w-full min-h-0 relative">
         
-        <!-- ================= RIGHT/TOP PANEL: CIRCUIT WORKBENCH ================= -->
-        <section class="order-1 lg:order-2 flex-1 flex flex-col p-2 sm:p-4 md:p-6 overflow-y-auto lg:h-full items-center justify-start lg:justify-center z-10 bg-slate-950">
-            
-            <div class="hardware-panel w-full max-w-5xl shrink-0 p-3 sm:p-4 md:p-8 relative">
-                <!-- Metallic Corners -->
-                <div class="metal-corner corner-tl"></div>
-                <div class="metal-corner corner-tr"></div>
-                <div class="metal-corner corner-bl"></div>
-                <div class="metal-corner corner-br"></div>
-
-                <!-- Panel Header with Integrated Live Badge -->
-                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 border-b border-slate-300 pb-3 gap-2">
-                    <div class="text-left">
-                        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-600/60 shadow-sm text-[10px] sm:text-xs text-slate-200 font-mono mb-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span>VOCATIONAL ELECTRONICS TRAINING PANEL</span>
-                        </div>
-                        <h2 class="text-lg md:text-2xl font-bold text-slate-800 tracking-wide">ชุดสาธิตวงจรทรานซิสเตอร์สวิตซ์</h2>
-                    </div>
-                    
-                    <!-- Integrated Status Badge -->
-                    <div id="circuitLiveBadge" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 text-xs md:text-sm font-semibold shrink-0 shadow-sm">
-                        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                        <span id="badgeStateText">Cut-off (OFF)</span>
-                    </div>
-                </div>
-
-                <!-- SVG Container -->
-                <div class="w-full relative">
-                    <svg id="circuitSvg" viewBox="0 0 950 550" class="w-full h-auto block select-none" preserveAspectRatio="xMidYMid meet">
-                        
-                        <defs>
-                            <g id="resistor"><polyline points="0,0 10,-10 20,10 30,-10 40,10 50,-10 60,0" fill="none" stroke="#0f172a" stroke-width="3" stroke-linejoin="round"/></g>
-                            <g id="ground">
-                                <line x1="0" y1="0" x2="0" y2="15" stroke="#0f172a" stroke-width="3.5"/>
-                                <line x1="-16" y1="15" x2="16" y2="15" stroke="#0f172a" stroke-width="3.5"/>
-                                <line x1="-10" y1="22" x2="10" y2="22" stroke="#0f172a" stroke-width="3.5"/>
-                                <line x1="-4" y1="29" x2="4" y2="29" stroke="#0f172a" stroke-width="3.5"/>
-                            </g>
-                            
-                            <!-- Terminal Socket Graphics -->
-                            <g id="socket-red"><circle cx="0" cy="0" r="11" fill="#dc2626" stroke="#991b1b" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#1e293b"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
-                            <g id="socket-black"><circle cx="0" cy="0" r="11" fill="#1e293b" stroke="#020617" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#0f172a"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
-                            <g id="socket-blue"><circle cx="0" cy="0" r="11" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#1e293b"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
-                            <g id="socket-purple"><circle cx="0" cy="0" r="11" fill="#7e22ce" stroke="#581c87" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#1e293b"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
-                            
-                            <!-- Realistic Multimeter Probes (Pointing Down) -->
-                            <g id="probe-red">
-                                <path d="M 0 0 L 1.5 -5 L 1.5 -24 L -1.5 -24 L -1.5 -5 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="0.5"/>
-                                <path d="M -5 -24 L 5 -24 L 6 -40 L 4 -85 L -4 -85 L -6 -40 Z" fill="#ef4444" stroke="#b91c1c" stroke-width="1.2"/>
-                                <rect x="-9" y="-40" width="18" height="6" rx="3" fill="#dc2626" stroke="#991b1b" stroke-width="1"/>
-                                <line x1="-4" y1="-50" x2="4" y2="-50" stroke="#991b1b" stroke-width="1.5"/>
-                                <line x1="-4" y1="-56" x2="4" y2="-56" stroke="#991b1b" stroke-width="1.5"/>
-                                <line x1="-4" y1="-62" x2="4" y2="-62" stroke="#991b1b" stroke-width="1.5"/>
-                                <line x1="-4" y1="-68" x2="4" y2="-68" stroke="#991b1b" stroke-width="1.5"/>
-                                <path d="M -3.5 -85 L 3.5 -85 L 2.5 -98 L -2.5 -98 Z" fill="#b91c1c"/>
-                            </g>
-                            <g id="probe-black">
-                                <path d="M 0 0 L 1.5 -5 L 1.5 -24 L -1.5 -24 L -1.5 -5 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="0.5"/>
-                                <path d="M -5 -24 L 5 -24 L 6 -40 L 4 -85 L -4 -85 L -6 -40 Z" fill="#1e293b" stroke="#020617" stroke-width="1.2"/>
-                                <rect x="-9" y="-40" width="18" height="6" rx="3" fill="#0f172a" stroke="#020617" stroke-width="1"/>
-                                <line x1="-4" y1="-50" x2="4" y2="-50" stroke="#020617" stroke-width="1.5"/>
-                                <line x1="-4" y1="-56" x2="4" y2="-56" stroke="#020617" stroke-width="1.5"/>
-                                <line x1="-4" y1="-62" x2="4" y2="-62" stroke="#020617" stroke-width="1.5"/>
-                                <line x1="-4" y1="-68" x2="4" y2="-68" stroke="#020617" stroke-width="1.5"/>
-                                <path d="M -3.5 -85 L 3.5 -85 L 2.5 -98 L -2.5 -98 Z" fill="#020617"/>
-                            </g>
-                        </defs>
-
-                        <!-- Background Boxes (Drawn first) -->
-                        <rect x="220" y="180" width="165" height="205" fill="#f8fafc" stroke="#2563eb" stroke-dasharray="5,5" stroke-width="1.5" rx="8"/>
-                        <!-- PULSE INPUT Box -->
-                        <rect x="225" y="405" width="155" height="60" fill="#faf5ff" stroke="#7e22ce" stroke-dasharray="5,5" stroke-width="1.5" rx="8"/>
-                        <text x="302" y="420" text-anchor="middle" font-size="12" fill="#7e22ce" font-weight="bold">PULSE INPUT</text>
-                        <text x="302" y="433" text-anchor="middle" font-size="11" fill="#7e22ce">0–5V DC</text>
-                        <text x="300" y="208" text-anchor="middle" font-size="16" fill="#1d4ed8" font-weight="bold">INPUT SELECT</text>
-
-                        <!-- Rails & Main Power -->
-                        <polyline points="80,480 880,480" class="wire wire-black"/>
-                        <line x1="80" y1="480" x2="80" y2="505" class="wire wire-black"/> <!-- Ground connection -->
-                        <use href="#socket-black" x="80" y="480"/>
-                        <use href="#ground" x="80" y="505"/>
-                        <text x="80" y="545" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">GND</text>
-
-                        <polyline points="80,80 600,80" class="wire wire-red"/>
-                        <use href="#socket-red" x="180" y="80"/>
-                        <text x="180" y="55" text-anchor="middle" font-size="18" font-weight="bold" fill="#dc2626">+5V</text>
-
-                        <!-- Power Supply Symbol -->
-                        <circle cx="80" cy="320" r="24" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"/>
-                        <text x="80" y="314" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">+</text>
-                        <text x="80" y="337" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">-</text>
-                        <text x="65" y="380" text-anchor="end" font-size="15" font-weight="bold" fill="#0f172a">+5V DC</text>
-                        
-                        <line x1="80" y1="344" x2="80" y2="480" class="wire wire-black"/>
-                        <line x1="80" y1="296" x2="80" y2="80" class="wire wire-red"/>
-
-                        <!-- Wiring into INPUT SELECT -->
-                        <polyline points="170,80 170,240 250,240" class="wire wire-red"/>
-                        <circle cx="170" cy="80" r="5" fill="#dc2626"/>
-                        <circle cx="250" cy="240" r="5" fill="#dc2626"/>
-
-                        <polyline points="170,480 170,300 250,300" class="wire wire-black"/>
-                        <circle cx="170" cy="480" r="5" fill="#0f172a"/>
-                        <circle cx="250" cy="300" r="5" fill="#0f172a"/>
-
-                        <!-- Pulse Wiring -->
-                        <polyline points="270,450 190,450 190,360 250,360" class="wire wire-purple"/>
-                        <circle cx="250" cy="360" r="5" fill="#0f172a"/>
-
-                        <!-- Input Select Labels -->
-                        <text x="265" y="244" font-size="14" font-weight="bold" fill="#16a34a">ON (5V)</text>
-                        <text x="265" y="296" font-size="13" font-weight="bold" fill="#1f2937">OFF</text>
-                        <text x="265" y="312" font-size="11" fill="#4b5563">(0V / GND)</text>
-                        <text x="265" y="358" font-size="13" font-weight="bold" fill="#7e22ce">PULSE</text>
-                        <text x="265" y="374" font-size="11" fill="#7e22ce">(0–5V DC)</text>
-
-                        <!-- Toggle Switch -->
-                        <rect x="330" y="270" width="22" height="60" rx="11" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/>
-                        <circle cx="341" cy="300" r="6" fill="#334155"/>
-                        <line id="switch-arm" x1="341" y1="300" x2="285" y2="300" stroke="#94a3b8" stroke-width="8" stroke-linecap="round" class="switch-toggle"/>
-                        <line id="switch-arm-inner" x1="341" y1="300" x2="285" y2="300" stroke="#f8fafc" stroke-width="3" stroke-linecap="round" class="switch-toggle"/>
-
-                        <line x1="341" y1="300" x2="385" y2="300" class="wire"/>
-                        <circle cx="385" cy="300" r="5" fill="#0f172a"/>
-                        <line x1="385" y1="300" x2="420" y2="300" class="wire"/>
-
-                        <!-- Pulse sockets -->
-                        <text x="252" y="454" font-size="14" font-weight="bold" fill="#7e22ce">+</text>
-                        <use href="#socket-purple" x="270" y="450"/>
-                        
-                        <text x="352" y="454" font-size="14" font-weight="bold" fill="#1f2937">-</text>
-                        <use href="#socket-black" x="335" y="450"/>
-                        <line x1="335" y1="450" x2="335" y2="480" class="wire wire-black"/>
-                        <circle cx="335" cy="480" r="5" fill="#0f172a"/>
-
-                        <!-- Base Path -->
-                        <use href="#socket-blue" x="420" y="300"/>
-                        <text x="410" y="275" font-size="18" font-weight="bold" fill="#2563eb">+</text>
-                        <text x="470" y="275" text-anchor="middle" font-size="20" font-weight="bold" fill="#1d4ed8">I<tspan baseline-shift="sub" font-size="14">B</tspan></text>
-
-                        <!-- IB Jumper -->
-                        <line id="wire-ib-jumper" x1="420" y1="300" x2="520" y2="300" stroke="#0f172a" stroke-width="2.5" stroke-dasharray="8,4"/>
-                        <text x="470" y="325" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">Insert Ammeter</text>
-                        <text x="470" y="340" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">for I<tspan baseline-shift="sub" font-size="10">B</tspan></text>
-
-                        <use href="#socket-black" x="520" y="300"/>
-                        <text x="520" y="275" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f172a">COM</text>
-
-                        <line x1="520" y1="300" x2="550" y2="300" class="wire"/>
-                        <use href="#resistor" x="550" y="300"/>
-                        <text x="580" y="275" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f172a">R<tspan baseline-shift="sub" font-size="12">B</tspan></text>
-                        <text x="580" y="325" text-anchor="middle" font-size="14" fill="#0f172a">4.7kΩ</text>
-                        <line x1="610" y1="300" x2="670" y2="300" class="wire"/>
-
-                        <!-- Collector Path -->
-                        <use href="#socket-red" x="600" y="80"/>
-                        <text x="585" y="60" font-size="18" font-weight="bold" fill="#dc2626">+</text>
-                        <text x="660" y="55" text-anchor="middle" font-size="20" font-weight="bold" fill="#1d4ed8">I<tspan baseline-shift="sub" font-size="14">C</tspan></text>
-
-                        <!-- IC Jumper -->
-                        <line id="wire-ic-jumper" x1="600" y1="80" x2="720" y2="80" stroke="#0f172a" stroke-width="2.5" stroke-dasharray="8,4"/>
-                        <text x="660" y="105" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">Insert Ammeter</text>
-                        <text x="660" y="120" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">for I<tspan baseline-shift="sub" font-size="10">C</tspan></text>
-
-                        <use href="#socket-black" x="720" y="80"/>
-                        <text x="720" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f172a">COM</text>
-
-                        <polyline points="720,80 800,80 800,100" class="wire"/>
-                        <use href="#resistor" transform="translate(800, 100) rotate(90)"/>
-                        <text x="830" y="130" font-size="16" font-weight="bold" fill="#0f172a">R<tspan baseline-shift="sub" font-size="12">LED</tspan></text>
-                        <text x="830" y="150" font-size="14" fill="#0f172a">330Ω</text>
-                        <line x1="800" y1="160" x2="800" y2="180" class="wire"/>
-
-                        <!-- LED Component -->
-                        <g id="led-visual" transform="translate(800, 200)">
-                            <path d="M-20,10 C-20,-10 -15,-20 0,-20 C15,-20 20,-10 20,10 Z" class="led-off" id="led-dome" stroke="#991b1b" stroke-width="2"/>
-                            <rect x="-24" y="10" width="48" height="6" fill="#991b1b" rx="2"/>
-                            <line x1="-8" y1="16" x2="-8" y2="40" stroke="#0f172a" stroke-width="4"/>
-                            <line x1="8" y1="16" x2="8" y2="40" stroke="#0f172a" stroke-width="4"/>
-                            <g id="led-rays" class="hidden" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round">
-                                <line x1="30" y1="-15" x2="45" y2="-25" /> <polygon points="45,-25 40,-27 43,-21" fill="#ef4444"/>
-                                <line x1="35" y1="10" x2="50" y2="5" /> <polygon points="50,5 45,2 46,8" fill="#ef4444"/>
-                            </g>
-                        </g>
-                        <polyline points="800,240 800,270 705,270" class="wire"/>
-                        <text x="845" y="210" font-size="14" font-weight="bold" fill="#0f172a">LED</text>
-                        <text x="845" y="225" font-size="12" fill="#475569">(LOAD)</text>
-
-                        <!-- Transistor Q1 -->
-                        <g id="q1-transistor" transform="translate(670, 280)">
-                            <circle cx="20" cy="20" r="35" fill="#e0f2fe" stroke="#0f172a" stroke-width="2.5"/>
-                            <line x1="-30" y1="20" x2="5" y2="20" stroke="#0f172a" stroke-width="4"/>
-                            <line x1="5" y1="0" x2="5" y2="40" stroke="#0f172a" stroke-width="5"/>
-                            <line x1="5" y1="10" x2="30" y2="-10" stroke="#0f172a" stroke-width="4"/>
-                            <line x1="30" y1="-10" x2="35" y2="-10" stroke="#0f172a" stroke-width="4"/> 
-                            <line x1="5" y1="30" x2="30" y2="50" stroke="#0f172a" stroke-width="4"/>
-                            <line x1="30" y1="50" x2="35" y2="50" stroke="#0f172a" stroke-width="4"/> 
-                            <polygon points="30,50 18,45 26,35" fill="#0f172a"/>
-                            <text x="-15" y="10" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0f172a">B</text>
-                            <text x="35" y="-20" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0f172a">C</text>
-                            <text x="35" y="70" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0f172a">E</text>
-                        </g>
-                        <text x="730" y="295" font-size="16" font-weight="bold" fill="#0f172a">Q1</text>
-                        <text x="730" y="315" font-size="14" fill="#475569">2N2222</text>
-                        <line x1="705" y1="330" x2="705" y2="480" class="wire"/>
-                        <circle cx="705" cy="480" r="5" fill="#0f172a"/>
-
-                        <!-- Voltage Measurement Terminals -->
-                        <!-- VBE -->
-                        <line x1="630" y1="300" x2="630" y2="390" class="wire"/>
-                        <circle cx="630" cy="300" r="5" fill="#0f172a"/>
-                        <use href="#socket-red" x="630" y="390"/>
-                        <text x="610" y="380" font-size="18" font-weight="bold" fill="#dc2626">+</text>
-                        <line x1="630" y1="440" x2="630" y2="480" class="wire"/>
-                        <circle cx="630" cy="480" r="5" fill="#0f172a"/>
-                        <use href="#socket-black" x="630" y="440"/>
-                        <text x="610" y="450" font-size="18" font-weight="bold" fill="#0f172a">-</text>
-                        <text x="580" y="420" text-anchor="middle" font-size="20" font-weight="bold" fill="#1d4ed8">V<tspan baseline-shift="sub" font-size="14">BE</tspan></text>
-
-                        <!-- VCE -->
-                        <line x1="800" y1="270" x2="880" y2="270" class="wire"/>
-                        <circle cx="800" cy="270" r="5" fill="#0f172a"/>
-                        <use href="#socket-red" x="880" y="270"/>
-                        <text x="900" y="275" font-size="18" font-weight="bold" fill="#dc2626">+</text>
-                        <line x1="880" y1="380" x2="880" y2="480" class="wire"/>
-                        <circle cx="880" cy="480" r="5" fill="#0f172a"/>
-                        <use href="#socket-black" x="880" y="380"/>
-                        <text x="900" y="385" font-size="18" font-weight="bold" fill="#0f172a">-</text>
-                        <text x="910" y="335" text-anchor="middle" font-size="24" font-weight="bold" fill="#1d4ed8">V<tspan baseline-shift="sub" font-size="16">CE</tspan></text>
-
-                        <!-- Particle Groups -->
-                        <g id="currentFlowGroupOn" class="hidden pointer-events-none">
-                            <circle class="electron flow-path-b" cx="0" cy="0"/>
-                            <circle class="electron flow-path-b" cx="0" cy="0" style="animation-delay: -1s;" />
-                            <circle class="electron flow-path-b" cx="0" cy="0" style="animation-delay: -2s;" />
-                            <circle class="electron flow-path-c" cx="0" cy="0"/>
-                            <circle class="electron flow-path-c" cx="0" cy="0" style="animation-delay: -0.5s;" />
-                            <circle class="electron flow-path-c" cx="0" cy="0" style="animation-delay: -1s;" />
-                            <circle class="electron flow-path-c" cx="0" cy="0" style="animation-delay: -1.5s;" />
-                            <circle class="electron flow-path-c" cx="0" cy="0" style="animation-delay: -2s;" />
-                            <circle class="electron flow-path-c" cx="0" cy="0" style="animation-delay: -2.5s;" />
-                        </g>
-
-                        <g id="currentFlowGroupPulse" class="hidden pointer-events-none">
-                            <circle class="electron-pulse flow-path-b-pulse" cx="0" cy="0"/>
-                            <circle class="electron-pulse flow-path-b-pulse" cx="0" cy="0" style="animation-delay: -0.8s;" />
-                            <circle class="electron-pulse flow-path-b-pulse" cx="0" cy="0" style="animation-delay: -1.6s;" />
-                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0"/>
-                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0" style="animation-delay: -0.5s;" />
-                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0" style="animation-delay: -1s;" />
-                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0" style="animation-delay: -1.5s;" />
-                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0" style="animation-delay: -2s;" />
-                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0" style="animation-delay: -2.5s;" />
-                        </g>
-
-                        <!-- Hotspots -->
-                        <g id="hotspots">
-                            <rect x="220" y="180" width="165" height="205" class="hotspot" onclick="showInfo('inputSelect')" rx="8"/>
-                            <rect x="540" y="270" width="70" height="60" class="hotspot" onclick="showInfo('rb')"/>
-                            <circle cx="690" cy="300" r="45" class="hotspot" onclick="showInfo('q1')"/>
-                            <rect x="770" y="90" width="60" height="80" class="hotspot" onclick="showInfo('rled')"/>
-                            <rect x="770" y="180" width="60" height="70" class="hotspot" onclick="showInfo('led')"/>
-                            <rect x="400" y="250" width="140" height="80" class="hotspot" onclick="showInfo('ib')"/>
-                            <rect x="580" y="40" width="160" height="70" class="hotspot" onclick="showInfo('ic')"/>
-                            <rect x="580" y="360" width="80" height="110" class="hotspot" onclick="showInfo('vbe')"/>
-                            <rect x="850" y="240" width="80" height="170" class="hotspot" onclick="showInfo('vce')"/>
-                        </g>
-                        
-                        <!-- Probes Drop Animation -->
-                        <g id="active-probes" class="hidden pointer-events-none">
-                            <use href="#probe-red" id="probe-red-instance" class="probe-drop" x="0" y="0" />
-                            <use href="#probe-black" id="probe-black-instance" class="probe-drop" x="0" y="0" />
-                        </g>
-
-                    </svg>
-                </div>
-            </div>
-        </section>
-
-        <!-- Left/Bottom Panel: Controls & Measurements (Reordered for Mobile) -->
+        <!-- Left/Bottom Panel: Controls & Measurements -->
         <aside class="order-2 lg:order-1 w-full lg:w-[380px] xl:w-[410px] bg-slate-900/95 border-t lg:border-t-0 lg:border-r border-slate-800 flex flex-col shrink-0 custom-scrollbar z-20 shadow-2xl">
             
             <!-- Sticky Tabs -->
@@ -567,7 +336,7 @@
                     <p id="statusDescription" class="text-xs text-slate-300 text-center leading-relaxed mb-3">
                         ไม่มีกระแส Base → Transistor ไม่นำกระแส → LED ดับ
                     </p>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="grid grid-cols-2 gap-2 text-xs mb-3">
                         <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-center">
                             <span class="block text-slate-400 text-[11px] mb-0.5">Transistor Q1</span>
                             <span id="q1Status" class="font-bold font-mono text-red-400">Cut-off (Open)</span>
@@ -577,13 +346,13 @@
                             <span id="ledStatus" class="font-bold font-mono text-red-400">OFF (ดับ)</span>
                         </div>
                     </div>
-                </div>
 
-                <!-- Post-Lesson Quiz Button -->
-                <button onclick="openQuizForm()" class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition flex items-center justify-center gap-2 text-sm tracking-wide">
-                    <i class="fas fa-file-signature text-lg"></i>
-                    <span>ทำแบบทดสอบประเมินความรู้</span>
-                </button>
+                    <!-- Quiz Button -->
+                    <button onclick="openQuizForm()" class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition flex items-center justify-center gap-2 text-sm tracking-wide">
+                        <i class="fas fa-file-signature text-lg"></i>
+                        <span>ทำแบบทดสอบประเมินความรู้</span>
+                    </button>
+                </div>
 
                 <!-- Quick Quiz Section -->
                 <div id="quizContainer" class="border border-indigo-500/30 bg-indigo-950/30 rounded-xl p-3.5 hidden flex-col shadow-inner">
@@ -756,6 +525,292 @@
             </div>
 
         </aside>
+
+        <!-- ================= RIGHT/TOP PANEL: CIRCUIT WORKBENCH ================= -->
+        <section class="order-1 lg:order-2 flex-1 flex flex-col p-2 sm:p-4 md:p-6 overflow-y-auto lg:h-full items-center justify-start lg:justify-center z-10 bg-slate-950">
+            
+            <div class="hardware-panel w-full max-w-5xl shrink-0 p-3 sm:p-4 md:p-8 relative">
+                <!-- Metallic Corners -->
+                <div class="metal-corner corner-tl"></div>
+                <div class="metal-corner corner-tr"></div>
+                <div class="metal-corner corner-bl"></div>
+                <div class="metal-corner corner-br"></div>
+
+                <!-- Panel Header -->
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 border-b border-slate-300 pb-3 gap-2">
+                    <div class="text-left">
+                        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-600/60 shadow-sm text-[10px] sm:text-xs text-slate-200 font-mono mb-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span>VOCATIONAL ELECTRONICS TRAINING PANEL</span>
+                        </div>
+                        <h2 class="text-lg md:text-2xl font-bold text-slate-800 tracking-wide">ชุดสาธิตวงจรทรานซิสเตอร์สวิตซ์</h2>
+                    </div>
+                    
+                    <!-- Integrated Status Badge -->
+                    <div id="circuitLiveBadge" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 text-xs md:text-sm font-semibold shrink-0 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                        <span id="badgeStateText">Cut-off (OFF)</span>
+                    </div>
+                </div>
+
+                <!-- SVG Container -->
+                <div class="w-full relative">
+                    <svg id="circuitSvg" viewBox="0 0 950 550" class="w-full h-auto block select-none" preserveAspectRatio="xMidYMid meet">
+                        
+                        <defs>
+                            <g id="resistor"><polyline points="0,0 10,-10 20,10 30,-10 40,10 50,-10 60,0" fill="none" stroke="#0f172a" stroke-width="3" stroke-linejoin="round"/></g>
+                            <g id="ground">
+                                <line x1="0" y1="0" x2="0" y2="15" stroke="#0f172a" stroke-width="3.5"/>
+                                <line x1="-16" y1="15" x2="16" y2="15" stroke="#0f172a" stroke-width="3.5"/>
+                                <line x1="-10" y1="22" x2="10" y2="22" stroke="#0f172a" stroke-width="3.5"/>
+                                <line x1="-4" y1="29" x2="4" y2="29" stroke="#0f172a" stroke-width="3.5"/>
+                            </g>
+                            
+                            <!-- Terminal Socket Graphics -->
+                            <g id="socket-red"><circle cx="0" cy="0" r="11" fill="#dc2626" stroke="#991b1b" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#1e293b"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
+                            <g id="socket-black"><circle cx="0" cy="0" r="11" fill="#1e293b" stroke="#020617" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#0f172a"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
+                            <g id="socket-blue"><circle cx="0" cy="0" r="11" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#1e293b"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
+                            <g id="socket-purple"><circle cx="0" cy="0" r="11" fill="#7e22ce" stroke="#581c87" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#1e293b"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
+                            
+                            <!-- Realistic Multimeter Probes -->
+                            <g id="probe-red">
+                                <path d="M 0 0 L 1.5 -5 L 1.5 -24 L -1.5 -24 L -1.5 -5 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="0.5"/>
+                                <path d="M -5 -24 L 5 -24 L 6 -40 L 4 -85 L -4 -85 L -6 -40 Z" fill="#ef4444" stroke="#b91c1c" stroke-width="1.2"/>
+                                <rect x="-9" y="-40" width="18" height="6" rx="3" fill="#dc2626" stroke="#991b1b" stroke-width="1"/>
+                                <line x1="-4" y1="-50" x2="4" y2="-50" stroke="#991b1b" stroke-width="1.5"/>
+                                <line x1="-4" y1="-56" x2="4" y2="-56" stroke="#991b1b" stroke-width="1.5"/>
+                                <line x1="-4" y1="-62" x2="4" y2="-62" stroke="#991b1b" stroke-width="1.5"/>
+                                <line x1="-4" y1="-68" x2="4" y2="-68" stroke="#991b1b" stroke-width="1.5"/>
+                                <path d="M -3.5 -85 L 3.5 -85 L 2.5 -98 L -2.5 -98 Z" fill="#b91c1c"/>
+                            </g>
+                            <g id="probe-black">
+                                <path d="M 0 0 L 1.5 -5 L 1.5 -24 L -1.5 -24 L -1.5 -5 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="0.5"/>
+                                <path d="M -5 -24 L 5 -24 L 6 -40 L 4 -85 L -4 -85 L -6 -40 Z" fill="#1e293b" stroke="#020617" stroke-width="1.2"/>
+                                <rect x="-9" y="-40" width="18" height="6" rx="3" fill="#0f172a" stroke="#020617" stroke-width="1"/>
+                                <line x1="-4" y1="-50" x2="4" y2="-50" stroke="#020617" stroke-width="1.5"/>
+                                <line x1="-4" y1="-56" x2="4" y2="-56" stroke="#020617" stroke-width="1.5"/>
+                                <line x1="-4" y1="-62" x2="4" y2="-62" stroke="#020617" stroke-width="1.5"/>
+                                <line x1="-4" y1="-68" x2="4" y2="-68" stroke="#020617" stroke-width="1.5"/>
+                                <path d="M -3.5 -85 L 3.5 -85 L 2.5 -98 L -2.5 -98 Z" fill="#020617"/>
+                            </g>
+                        </defs>
+
+                        <!-- Rails & Main Power -->
+                        <polyline points="80,480 880,480" class="wire wire-black"/>
+                        <line x1="80" y1="480" x2="80" y2="505" class="wire wire-black"/> 
+                        <use href="#socket-black" x="80" y="480"/>
+                        <use href="#ground" x="80" y="505"/>
+                        <text x="80" y="545" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">GND</text>
+
+                        <polyline points="80,80 600,80" class="wire wire-red"/>
+                        <use href="#socket-red" x="180" y="80"/>
+                        <text x="180" y="55" text-anchor="middle" font-size="18" font-weight="bold" fill="#dc2626">+5V</text>
+
+                        <!-- Power Supply Symbol -->
+                        <circle cx="80" cy="320" r="24" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"/>
+                        <text x="80" y="314" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">+</text>
+                        <text x="80" y="337" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">-</text>
+                        <text x="65" y="380" text-anchor="end" font-size="15" font-weight="bold" fill="#0f172a">+5V DC</text>
+                        
+                        <line x1="80" y1="344" x2="80" y2="480" class="wire wire-black"/>
+                        <line x1="80" y1="296" x2="80" y2="80" class="wire wire-red"/>
+
+                        <!-- Wiring into INPUT SELECT -->
+                        <rect x="220" y="180" width="165" height="205" fill="#f8fafc" stroke="#2563eb" stroke-dasharray="5,5" stroke-width="1.5" rx="8"/>
+                        <rect x="225" y="405" width="155" height="60" fill="#faf5ff" stroke="#7e22ce" stroke-dasharray="5,5" stroke-width="1.5" rx="8"/>
+                        <text x="302" y="420" text-anchor="middle" font-size="12" fill="#7e22ce" font-weight="bold">PULSE INPUT</text>
+                        <text x="302" y="433" text-anchor="middle" font-size="11" fill="#7e22ce">0–5V DC</text>
+                        <text x="300" y="208" text-anchor="middle" font-size="16" fill="#1d4ed8" font-weight="bold">INPUT SELECT</text>
+
+                        <polyline points="170,80 170,240 250,240" class="wire wire-red"/>
+                        <circle cx="170" cy="80" r="5" fill="#dc2626"/>
+                        <circle cx="250" cy="240" r="5" fill="#dc2626"/>
+
+                        <polyline points="170,480 170,300 250,300" class="wire wire-black"/>
+                        <circle cx="170" cy="480" r="5" fill="#0f172a"/>
+                        <circle cx="250" cy="300" r="5" fill="#0f172a"/>
+
+                        <!-- Pulse Wiring -->
+                        <polyline points="270,450 190,450 190,360 250,360" class="wire wire-purple"/>
+                        <circle cx="250" cy="360" r="5" fill="#0f172a"/>
+
+                        <!-- Input Select Labels -->
+                        <text x="265" y="244" font-size="14" font-weight="bold" fill="#16a34a">ON (5V)</text>
+                        <text x="265" y="296" font-size="13" font-weight="bold" fill="#1f2937">OFF</text>
+                        <text x="265" y="312" font-size="11" fill="#4b5563">(0V / GND)</text>
+                        <text x="265" y="358" font-size="13" font-weight="bold" fill="#7e22ce">PULSE</text>
+                        <text x="265" y="374" font-size="11" fill="#7e22ce">(0–5V DC)</text>
+
+                        <!-- Toggle Switch -->
+                        <rect x="330" y="270" width="22" height="60" rx="11" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/>
+                        <circle cx="341" cy="300" r="6" fill="#334155"/>
+                        <line id="switch-arm" x1="341" y1="300" x2="285" y2="300" stroke="#94a3b8" stroke-width="8" stroke-linecap="round" class="switch-toggle"/>
+                        <line id="switch-arm-inner" x1="341" y1="300" x2="285" y2="300" stroke="#f8fafc" stroke-width="3" stroke-linecap="round" class="switch-toggle"/>
+
+                        <line x1="341" y1="300" x2="385" y2="300" class="wire"/>
+                        <circle cx="385" cy="300" r="5" fill="#0f172a"/>
+                        <line x1="385" y1="300" x2="420" y2="300" class="wire"/>
+
+                        <!-- Pulse sockets -->
+                        <text x="252" y="454" font-size="14" font-weight="bold" fill="#7e22ce">+</text>
+                        <use href="#socket-purple" x="270" y="450"/>
+                        
+                        <text x="352" y="454" font-size="14" font-weight="bold" fill="#1f2937">-</text>
+                        <use href="#socket-black" x="335" y="450"/>
+                        <line x1="335" y1="450" x2="335" y2="480" class="wire wire-black"/>
+                        <circle cx="335" cy="480" r="5" fill="#0f172a"/>
+
+                        <!-- Base Path -->
+                        <use href="#socket-blue" x="420" y="300"/>
+                        <text x="410" y="275" font-size="18" font-weight="bold" fill="#2563eb">+</text>
+                        <text x="470" y="275" text-anchor="middle" font-size="20" font-weight="bold" fill="#1d4ed8">I<tspan baseline-shift="sub" font-size="14">B</tspan></text>
+
+                        <line id="wire-ib-jumper" x1="420" y1="300" x2="520" y2="300" stroke="#0f172a" stroke-width="2.5" stroke-dasharray="8,4"/>
+                        <text x="470" y="325" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">Insert Ammeter</text>
+                        <text x="470" y="340" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">for I<tspan baseline-shift="sub" font-size="10">B</tspan></text>
+
+                        <use href="#socket-black" x="520" y="300"/>
+                        <text x="520" y="275" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f172a">COM</text>
+
+                        <line x1="520" y1="300" x2="550" y2="300" class="wire"/>
+                        <use href="#resistor" x="550" y="300"/>
+                        <text x="580" y="275" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f172a">R<tspan baseline-shift="sub" font-size="12">B</tspan></text>
+                        <text x="580" y="325" text-anchor="middle" font-size="14" fill="#0f172a">4.7kΩ</text>
+                        <line x1="610" y1="300" x2="670" y2="300" class="wire"/>
+
+                        <!-- Collector Path -->
+                        <use href="#socket-red" x="600" y="80"/>
+                        <text x="585" y="60" font-size="18" font-weight="bold" fill="#dc2626">+</text>
+                        <text x="660" y="55" text-anchor="middle" font-size="20" font-weight="bold" fill="#1d4ed8">I<tspan baseline-shift="sub" font-size="14">C</tspan></text>
+
+                        <line id="wire-ic-jumper" x1="600" y1="80" x2="720" y2="80" stroke="#0f172a" stroke-width="2.5" stroke-dasharray="8,4"/>
+                        <text x="660" y="105" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">Insert Ammeter</text>
+                        <text x="660" y="120" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">for I<tspan baseline-shift="sub" font-size="10">C</tspan></text>
+
+                        <use href="#socket-black" x="720" y="80"/>
+                        <text x="720" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f172a">COM</text>
+
+                        <polyline points="720,80 800,80 800,100" class="wire"/>
+                        <use href="#resistor" transform="translate(800, 100) rotate(90)"/>
+                        <text x="830" y="130" font-size="16" font-weight="bold" fill="#0f172a">R<tspan baseline-shift="sub" font-size="12">LED</tspan></text>
+                        <text x="830" y="150" font-size="14" fill="#0f172a">330Ω</text>
+                        <line x1="800" y1="160" x2="800" y2="180" class="wire"/>
+
+                        <!-- LED Component -->
+                        <g id="led-visual" transform="translate(800, 200)">
+                            <path d="M-20,10 C-20,-10 -15,-20 0,-20 C15,-20 20,-10 20,10 Z" class="led-off" id="led-dome" stroke="#991b1b" stroke-width="2"/>
+                            <rect x="-24" y="10" width="48" height="6" fill="#991b1b" rx="2"/>
+                            <line x1="-8" y1="16" x2="-8" y2="40" stroke="#0f172a" stroke-width="4"/>
+                            <line x1="8" y1="16" x2="8" y2="40" stroke="#0f172a" stroke-width="4"/>
+                            <g id="led-rays" class="hidden" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round">
+                                <line x1="30" y1="-15" x2="45" y2="-25" /> <polygon points="45,-25 40,-27 43,-21" fill="#ef4444"/>
+                                <line x1="35" y1="10" x2="50" y2="5" /> <polygon points="50,5 45,2 46,8" fill="#ef4444"/>
+                            </g>
+                        </g>
+                        <polyline points="800,240 800,270 705,270" class="wire"/>
+                        <text x="845" y="210" font-size="14" font-weight="bold" fill="#0f172a">LED</text>
+                        <text x="845" y="225" font-size="12" fill="#475569">(LOAD)</text>
+
+                        <!-- Transistor Q1 -->
+                        <g id="q1-transistor" transform="translate(670, 280)">
+                            <circle cx="20" cy="20" r="35" fill="#e0f2fe" stroke="#0f172a" stroke-width="2.5"/>
+                            <line x1="-30" y1="20" x2="5" y2="20" stroke="#0f172a" stroke-width="4"/>
+                            <line x1="5" y1="0" x2="5" y2="40" stroke="#0f172a" stroke-width="5"/>
+                            <line x1="5" y1="10" x2="30" y2="-10" stroke="#0f172a" stroke-width="4"/>
+                            <line x1="30" y1="-10" x2="35" y2="-10" stroke="#0f172a" stroke-width="4"/> 
+                            <line x1="5" y1="30" x2="30" y2="50" stroke="#0f172a" stroke-width="4"/>
+                            <line x1="30" y1="50" x2="35" y2="50" stroke="#0f172a" stroke-width="4"/> 
+                            <polygon points="30,50 18,45 26,35" fill="#0f172a"/>
+                            <text x="-15" y="10" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0f172a">B</text>
+                            <text x="35" y="-20" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0f172a">C</text>
+                            <text x="35" y="70" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0f172a">E</text>
+                        </g>
+                        <text x="730" y="295" font-size="16" font-weight="bold" fill="#0f172a">Q1</text>
+                        <text x="730" y="315" font-size="14" fill="#475569">2N2222</text>
+                        <line x1="705" y1="330" x2="705" y2="480" class="wire"/>
+                        <circle cx="705" cy="480" r="5" fill="#0f172a"/>
+
+                        <!-- Voltage Measurement Terminals -->
+                        <line x1="630" y1="300" x2="630" y2="390" class="wire"/>
+                        <circle cx="630" cy="300" r="5" fill="#0f172a"/>
+                        <use href="#socket-red" x="630" y="390"/>
+                        <text x="610" y="380" font-size="18" font-weight="bold" fill="#dc2626">+</text>
+                        <line x1="630" y1="440" x2="630" y2="480" class="wire"/>
+                        <circle cx="630" cy="480" r="5" fill="#0f172a"/>
+                        <use href="#socket-black" x="630" y="440"/>
+                        <text x="610" y="450" font-size="18" font-weight="bold" fill="#0f172a">-</text>
+                        <text x="580" y="420" text-anchor="middle" font-size="20" font-weight="bold" fill="#1d4ed8">V<tspan baseline-shift="sub" font-size="14">BE</tspan></text>
+
+                        <line x1="800" y1="270" x2="880" y2="270" class="wire"/>
+                        <circle cx="800" cy="270" r="5" fill="#0f172a"/>
+                        <use href="#socket-red" x="880" y="270"/>
+                        <text x="900" y="275" font-size="18" font-weight="bold" fill="#dc2626">+</text>
+                        <line x1="880" y1="380" x2="880" y2="480" class="wire"/>
+                        <circle cx="880" cy="480" r="5" fill="#0f172a"/>
+                        <use href="#socket-black" x="880" y="380"/>
+                        <text x="900" y="385" font-size="18" font-weight="bold" fill="#0f172a">-</text>
+                        <text x="910" y="335" text-anchor="middle" font-size="24" font-weight="bold" fill="#1d4ed8">V<tspan baseline-shift="sub" font-size="16">CE</tspan></text>
+
+                        <!-- Particle Groups -->
+                        <g id="currentFlowGroupOn" class="hidden pointer-events-none">
+                            <circle class="electron" cx="0" cy="0">
+                                <animateMotion dur="3s" repeatCount="indefinite" path="M 170 80 L 170 240 L 250 240 L 340 300 L 420 300 L 520 300 L 550 300 L 610 300 L 670 300 L 705 330 L 705 480 L 80 480 L 80 80 L 170 80"/>
+                            </circle>
+                            <circle class="electron" cx="0" cy="0">
+                                <animateMotion dur="3s" begin="-1s" repeatCount="indefinite" path="M 170 80 L 170 240 L 250 240 L 340 300 L 420 300 L 520 300 L 550 300 L 610 300 L 670 300 L 705 330 L 705 480 L 80 480 L 80 80 L 170 80"/>
+                            </circle>
+                            <circle class="electron" cx="0" cy="0">
+                                <animateMotion dur="3s" begin="-2s" repeatCount="indefinite" path="M 170 80 L 170 240 L 250 240 L 340 300 L 420 300 L 520 300 L 550 300 L 610 300 L 670 300 L 705 330 L 705 480 L 80 480 L 80 80 L 170 80"/>
+                            </circle>
+                            <circle class="electron" cx="0" cy="0">
+                                <animateMotion dur="2.8s" repeatCount="indefinite" path="M 180 80 L 600 80 L 720 80 L 800 80 L 800 160 L 800 240 L 800 270 L 705 270 L 705 330 L 705 480 L 80 480 L 80 80 L 180 80"/>
+                            </circle>
+                            <circle class="electron" cx="0" cy="0">
+                                <animateMotion dur="2.8s" begin="-0.9s" repeatCount="indefinite" path="M 180 80 L 600 80 L 720 80 L 800 80 L 800 160 L 800 240 L 800 270 L 705 270 L 705 330 L 705 480 L 80 480 L 80 80 L 180 80"/>
+                            </circle>
+                            <circle class="electron" cx="0" cy="0">
+                                <animateMotion dur="2.8s" begin="-1.8s" repeatCount="indefinite" path="M 180 80 L 600 80 L 720 80 L 800 80 L 800 160 L 800 240 L 800 270 L 705 270 L 705 330 L 705 480 L 80 480 L 80 80 L 180 80"/>
+                            </circle>
+                        </g>
+
+                        <g id="currentFlowGroupPulse" class="hidden pointer-events-none">
+                            <circle class="electron-pulse" cx="0" cy="0">
+                                <animateMotion dur="2.6s" repeatCount="indefinite" path="M 270 450 L 190 450 L 190 360 L 250 360 L 341 300 L 420 300 L 520 300 L 550 300 L 610 300 L 670 300 L 705 330 L 705 480 L 335 480 L 335 450 L 270 450"/>
+                            </circle>
+                            <circle class="electron-pulse" cx="0" cy="0">
+                                <animateMotion dur="2.6s" begin="-0.8s" repeatCount="indefinite" path="M 270 450 L 190 450 L 190 360 L 250 360 L 341 300 L 420 300 L 520 300 L 550 300 L 610 300 L 670 300 L 705 330 L 705 480 L 335 480 L 335 450 L 270 450"/>
+                            </circle>
+                            <circle class="electron-pulse-c" cx="0" cy="0">
+                                <animateMotion dur="2.8s" repeatCount="indefinite" path="M 180 80 L 600 80 L 720 80 L 800 80 L 800 160 L 800 240 L 800 270 L 705 270 L 705 330 L 705 480 L 80 480 L 80 80 L 180 80"/>
+                            </circle>
+                            <circle class="electron-pulse-c" cx="0" cy="0">
+                                <animateMotion dur="2.8s" begin="-1.4s" repeatCount="indefinite" path="M 180 80 L 600 80 L 720 80 L 800 80 L 800 160 L 800 240 L 800 270 L 705 270 L 705 330 L 705 480 L 80 480 L 80 80 L 180 80"/>
+                            </circle>
+                        </g>
+
+                        <!-- Hotspots -->
+                        <g id="hotspots">
+                            <rect x="220" y="180" width="165" height="205" class="hotspot" onclick="showInfo('inputSelect')" rx="8"/>
+                            <rect x="540" y="270" width="70" height="60" class="hotspot" onclick="showInfo('rb')"/>
+                            <circle cx="690" cy="300" r="45" class="hotspot" onclick="showInfo('q1')"/>
+                            <rect x="770" y="90" width="60" height="80" class="hotspot" onclick="showInfo('rled')"/>
+                            <rect x="770" y="180" width="60" height="70" class="hotspot" onclick="showInfo('led')"/>
+                            <rect x="400" y="250" width="140" height="80" class="hotspot" onclick="showInfo('ib')"/>
+                            <rect x="580" y="40" width="160" height="70" class="hotspot" onclick="showInfo('ic')"/>
+                            <rect x="580" y="360" width="80" height="110" class="hotspot" onclick="showInfo('vbe')"/>
+                            <rect x="850" y="240" width="80" height="170" class="hotspot" onclick="showInfo('vce')"/>
+                        </g>
+                        
+                        <!-- Probes Drop Animation -->
+                        <g id="active-probes" class="hidden pointer-events-none">
+                            <use href="#probe-red" id="probe-red-instance" class="probe-drop" x="0" y="0" />
+                            <use href="#probe-black" id="probe-black-instance" class="probe-drop" x="0" y="0" />
+                        </g>
+
+                    </svg>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- DSO Modal -->
@@ -833,8 +888,8 @@
                     <i class="fas fa-clipboard-user text-lg"></i> 
                     <span>ลงทะเบียนเข้าใช้งานชุดสาธิต</span>
                 </h3>
-                <button onclick="closeGoogleForm()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition focus:outline-none flex items-center justify-center text-xs gap-1" title="ปิดหน้าต่าง">
-                    <span class="mr-1 hidden sm:inline">ปิด</span><i class="fas fa-times text-lg"></i>
+                <button onclick="closeGoogleForm()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg transition focus:outline-none flex items-center justify-center text-xs gap-1.5" title="ปิดหน้าต่าง">
+                    <span class="font-bold">ปิด</span> <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
             <div class="flex-1 w-full bg-slate-50 relative">
@@ -865,8 +920,8 @@
                     <i class="fas fa-clipboard-list text-lg"></i> 
                     <span>แบบทดสอบประเมินความรู้</span>
                 </h3>
-                <button onclick="closeQuizForm()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition focus:outline-none flex items-center justify-center text-xs gap-1" title="ปิดหน้าต่าง">
-                    <span class="mr-1 hidden sm:inline">ปิด</span><i class="fas fa-times text-lg"></i>
+                <button onclick="closeQuizForm()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg transition focus:outline-none flex items-center justify-center text-xs gap-1.5" title="ปิดหน้าต่าง">
+                    <span class="font-bold">ปิด</span> <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
             <div class="flex-1 w-full bg-slate-50 relative">
@@ -889,8 +944,30 @@
         </div>
     </div>
 
+    <!-- Tutorial Guide Modal -->
+    <div id="tutorialModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[90] hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-750 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform scale-95 opacity-0 transition-all duration-300 ring-1 ring-white/10" id="tutorialModalContent">
+            <div id="tutorialHeader" class="bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-3.5 flex justify-between items-center text-white">
+                <h3 class="font-bold text-sm md:text-base flex items-center gap-2" id="tutorialTitle">
+                    <i class="fas fa-graduation-cap"></i> <span>คำแนะนำการใช้งาน</span>
+                </h3>
+                <button onclick="closeTutorial()" class="text-white/80 hover:text-white focus:outline-none"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            <div class="p-5 space-y-4 text-xs text-slate-300">
+                <p id="tutorialSubtitle" class="text-slate-200 font-medium"></p>
+                <div id="tutorialSteps" class="space-y-3"></div>
+            </div>
+            <div class="bg-slate-850 px-5 py-3.5 flex justify-between items-center border-t border-slate-800">
+                <span id="tutorialBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">คำแนะนำ</span>
+                <button onclick="closeTutorial()" id="tutorialConfirmBtn" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-2 px-5 rounded-xl shadow-lg transition text-xs flex items-center gap-1.5">
+                    <span>เริ่มต้นใช้งาน</span> <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Interactive Alert Toast / Message Box -->
-    <div id="msgBox" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
+    <div id="msgBox" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-750 rounded-2xl shadow-2xl max-w-sm w-full p-5 text-center ring-1 ring-white/10">
             <div id="msgIcon" class="text-4xl mb-3"></div>
             <h3 id="msgTitle" class="text-base font-bold text-white mb-2"></h3>
@@ -913,8 +990,64 @@
         let measurementMode = 'voltage'; 
         let currentSelectedTarget = '';
         let isProbesConnected = false;
+        let hasSeenMeasureTutorial = false;
 
-        // Quiz Questions Data
+        const tutorialData = {
+            learn: {
+                title: "คำแนะนำ: 1. เรียนรู้ & จำลองสภาวะ",
+                subtitle: "ยินดีต้อนรับสู่ชุดสาธิต! ขั้นตอนการศึกษาการทำงานของวงจรมีดังนี้:",
+                badge: "หน้า 1: เรียนรู้สภาวะ",
+                headerGradient: "bg-gradient-to-r from-cyan-600 to-blue-600",
+                confirmBtnClass: "bg-cyan-500 hover:bg-cyan-400 text-slate-950",
+                steps: [
+                    {
+                        num: "1",
+                        title: "คลิกสำรวจอุปกรณ์บนบอร์ด",
+                        desc: "คลิกที่ <strong>กรอบสี่เหลี่ยมประสีฟ้า</strong> บนแผงวงจร (เช่น $R_B, Q_1, R_{LED}$, หลอด LED หรือจุดวัดต่างๆ) เพื่อเรียนรู้โครงสร้างหน้าที่และสูตรคำนวณ"
+                    },
+                    {
+                        num: "2",
+                        title: "ทดลองสลับสวิตช์ INPUT SELECT",
+                        desc: "เลือกสภาวะอินพุตระหว่าง <strong>OFF (0V)</strong>, <strong>ON (5V)</strong> หรือ <strong>PULSE (สัญญาณพัลส์)</strong> เพื่อสังเกตการเปิด-ปิดวงจรและหลอดไฟ LED"
+                    },
+                    {
+                        num: "3",
+                        title: "สังเกตการเคลื่อนที่ของกระแส & Telemetry",
+                        desc: "ดูเส้นทางอนุภาคกระแสไฟฟ้า ($I_B$ และ $I_C$) และตรวจสอบสถานะวงจรระหว่าง <strong>Cut-off</strong> และ <strong>Saturation</strong> แบบเรียลไทม์"
+                    }
+                ]
+            },
+            measure: {
+                title: "คำแนะนำ: 2. ทดลองวัด & บันทึกผล",
+                subtitle: "แนวปฏิบัติการใช้มัลติมิเตอร์และการบันทึกผลการทดลอง:",
+                badge: "หน้า 2: ปฏิบัติการวัด",
+                headerGradient: "bg-gradient-to-r from-emerald-600 to-teal-600",
+                confirmBtnClass: "bg-emerald-500 hover:bg-emerald-400 text-slate-950",
+                steps: [
+                    {
+                        num: "1",
+                        title: "เลือกโหมดของเครื่องวัดให้ถูกต้อง",
+                        desc: "เลือก <strong>DC Voltage (V)</strong> สำหรับวัดแรงดัน หรือ <strong>DC Current (mA)</strong> สำหรับวัดกระแสไฟฟ้า"
+                    },
+                    {
+                        num: "2",
+                        title: "เลือกตำแหน่งทดสอบ (Test Point)",
+                        desc: "เลือกตำแหน่งที่ต้องการวัด เช่น $V_{BE}, V_{CE}$ หรือ $I_B, I_C$ ให้สอดคล้องกับโหมดมิเตอร์ที่ตั้งไว้"
+                    },
+                    {
+                        num: "3",
+                        title: "กดปุ่ม 'นำหัวโพรบไปจิ้มวัดค่า'",
+                        desc: "ระบบจะจำลองการนำหัวโพรบไปแตะที่จุดวัดเสมือนจริง และแสดงค่าตัวเลขบนหน้าปัดมัลติมิเตอร์ LCD"
+                    },
+                    {
+                        num: "4",
+                        title: "บันทึกผลและตรวจคำตอบ",
+                        desc: "นำค่าที่วัดได้ทั้งสภาวะ OFF และ ON มากรอกลงใน <strong>ตารางบันทึกผล</strong> แล้วกดปุ่ม <strong>'ตรวจคำตอบการทดลอง'</strong> เพื่อดูเฉลยทางทฤษฎี"
+                    }
+                ]
+            }
+        };
+
         let currentQuizIndex = 0;
         const quizList = [
             {
@@ -1029,7 +1162,6 @@
             changeMode('off');
             renderQuiz();
             
-            // Show Registration Google Form on load
             const formModal = document.getElementById('googleFormModal');
             if(formModal) {
                 formModal.classList.remove('hidden');
@@ -1060,6 +1192,13 @@
                 hideAllMeterGuides();
                 const measureFeedback = document.getElementById('measureFeedback');
                 if (measureFeedback) measureFeedback.classList.add('hidden');
+
+                if (!hasSeenMeasureTutorial) {
+                    hasSeenMeasureTutorial = true;
+                    setTimeout(() => {
+                        showTutorial('measure');
+                    }, 250);
+                }
             }
         }
 
@@ -1067,11 +1206,11 @@
             const badge = document.getElementById('circuitLiveBadge');
             if (!badge) return;
             if (color === 'red') {
-                badge.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 text-xs md:text-sm font-semibold shrink-0 shadow-sm";
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span><span id="badgeStateText">${text}</span>`;
+                badge.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 text-xs md:text-sm font-semibold shrink-0 shadow-sm";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-400 animate-ping"></span><span id="badgeStateText">${text}</span>`;
             } else if (color === 'emerald') {
-                badge.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 text-xs md:text-sm font-semibold shrink-0 shadow-sm";
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span><span id="badgeStateText">${text}</span>`;
+                badge.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs md:text-sm font-semibold shrink-0 shadow-sm";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span><span id="badgeStateText">${text}</span>`;
             } else if (color === 'purple') {
                 badge.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/30 text-xs md:text-sm font-semibold shrink-0 shadow-sm";
                 badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span><span id="badgeStateText">${text}</span>`;
@@ -1081,8 +1220,6 @@
         function showMsgBox(title, text, type = 'info') {
             const box = document.getElementById('msgBox');
             const icon = document.getElementById('msgIcon');
-            if (!box || !icon) return;
-
             document.getElementById('msgTitle').innerText = title;
             document.getElementById('msgText').innerHTML = text;
             
@@ -1101,11 +1238,8 @@
         }
 
         function closeMsgBox() {
-            const box = document.getElementById('msgBox');
-            if (box) {
-                box.classList.add('hidden');
-                box.classList.remove('flex');
-            }
+            document.getElementById('msgBox').classList.add('hidden');
+            document.getElementById('msgBox').classList.remove('flex');
         }
 
         function changeMode(mode) {
@@ -1131,32 +1265,26 @@
             const toggleArmInner = document.getElementById('switch-arm-inner');
             const pulseControls = document.getElementById('pulseControls');
 
-            if (pulseControls) pulseControls.classList.add('hidden');
+            if(pulseControls) pulseControls.classList.add('hidden');
 
             if (mode === 'off') {
-                if(toggleArm) toggleArm.setAttribute('x2', '285');
-                if(toggleArm) toggleArm.setAttribute('y2', '300');
-                if(toggleArmInner) toggleArmInner.setAttribute('x2', '285');
-                if(toggleArmInner) toggleArmInner.setAttribute('y2', '300');
+                if(toggleArm) { toggleArm.setAttribute('x2', '285'); toggleArm.setAttribute('y2', '300'); }
+                if(toggleArmInner) { toggleArmInner.setAttribute('x2', '285'); toggleArmInner.setAttribute('y2', '300'); }
                 setCircuitState(false);
                 updateStatusPanel("CUT-OFF (OFF)", "ไม่มีกระแส Base → Transistor ไม่นำกระแส → LED ดับ", "text-red-400", "bg-red-950/40", "border-red-500/30");
                 updateLiveBadge("Cut-off (OFF)", "red");
                 
             } else if (mode === 'on') {
-                if(toggleArm) toggleArm.setAttribute('x2', '290');
-                if(toggleArm) toggleArm.setAttribute('y2', '250');
-                if(toggleArmInner) toggleArmInner.setAttribute('x2', '290');
-                if(toggleArmInner) toggleArmInner.setAttribute('y2', '250');
+                if(toggleArm) { toggleArm.setAttribute('x2', '290'); toggleArm.setAttribute('y2', '250'); }
+                if(toggleArmInner) { toggleArmInner.setAttribute('x2', '290'); toggleArmInner.setAttribute('y2', '250'); }
                 setCircuitState(true);
                 updateStatusPanel("SATURATION (ON)", "มีกระแส Base → Q1 นำกระแส → กระแส IC ไหล → LED ติด", "text-emerald-400", "bg-emerald-950/40", "border-emerald-500/30");
                 closeGraphModal();
                 updateLiveBadge("Saturation (ON)", "emerald");
                 
             } else if (mode === 'pulse') {
-                if(toggleArm) toggleArm.setAttribute('x2', '290');
-                if(toggleArm) toggleArm.setAttribute('y2', '350');
-                if(toggleArmInner) toggleArmInner.setAttribute('x2', '290');
-                if(toggleArmInner) toggleArmInner.setAttribute('y2', '350');
+                if(toggleArm) { toggleArm.setAttribute('x2', '290'); toggleArm.setAttribute('y2', '350'); }
+                if(toggleArmInner) { toggleArmInner.setAttribute('x2', '290'); toggleArmInner.setAttribute('y2', '350'); }
                 if(pulseControls) pulseControls.classList.remove('hidden');
                 
                 pulseState = false;
@@ -1188,44 +1316,23 @@
 
                 if(ledDome) ledDome.classList.replace('led-off', 'led-on');
                 if(ledRays) ledRays.classList.remove('hidden');
+                const q1Status = document.getElementById('q1Status');
+                if(q1Status) { q1Status.innerText = "Saturation (Closed)"; q1Status.className = "font-bold font-mono text-emerald-400"; }
+                const ledStatus = document.getElementById('ledStatus');
+                if(ledStatus) { ledStatus.innerText = "ON (สว่าง)"; ledStatus.className = "font-bold font-mono text-emerald-400"; }
+                if(q1ActiveBadge) { q1ActiveBadge.innerText = "Saturation"; q1ActiveBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 font-bold"; }
                 
-                const q1s = document.getElementById('q1Status');
-                if(q1s) {
-                    q1s.innerText = "Saturation (Closed)";
-                    q1s.className = "font-bold font-mono text-emerald-400";
-                }
-                const leds = document.getElementById('ledStatus');
-                if(leds) {
-                    leds.innerText = "ON (สว่าง)";
-                    leds.className = "font-bold font-mono text-emerald-400";
-                }
-                
-                if(q1ActiveBadge) {
-                    q1ActiveBadge.innerText = "Saturation";
-                    q1ActiveBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 font-bold";
-                }
             } else {
                 if (flowGroupOn) flowGroupOn.classList.add('hidden');
                 if (flowGroupPulse) flowGroupPulse.classList.add('hidden');
 
                 if(ledDome) ledDome.classList.replace('led-on', 'led-off');
                 if(ledRays) ledRays.classList.add('hidden');
-                
-                const q1s = document.getElementById('q1Status');
-                if(q1s) {
-                    q1s.innerText = "Cut-off (Open)";
-                    q1s.className = "font-bold font-mono text-red-400";
-                }
-                const leds = document.getElementById('ledStatus');
-                if(leds) {
-                    leds.innerText = "OFF (ดับ)";
-                    leds.className = "font-bold font-mono text-red-400";
-                }
-                
-                if(q1ActiveBadge) {
-                    q1ActiveBadge.innerText = "Cut-off";
-                    q1ActiveBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-red-500/20 text-red-400 font-bold";
-                }
+                const q1Status = document.getElementById('q1Status');
+                if(q1Status) { q1Status.innerText = "Cut-off (Open)"; q1Status.className = "font-bold font-mono text-red-400"; }
+                const ledStatus = document.getElementById('ledStatus');
+                if(ledStatus) { ledStatus.innerText = "OFF (ดับ)"; ledStatus.className = "font-bold font-mono text-red-400"; }
+                if(q1ActiveBadge) { q1ActiveBadge.innerText = "Cut-off"; q1ActiveBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-red-500/20 text-red-400 font-bold"; }
             }
         }
 
@@ -1743,7 +1850,6 @@
             }
         }
 
-        // Google Forms Functions
         function handleFormLoad() {
             const loader = document.getElementById('formLoading');
             if (loader) loader.style.display = 'none';
@@ -1755,6 +1861,75 @@
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
             }
+            setTimeout(() => {
+                showTutorial('learn');
+            }, 300);
+        }
+
+        function showTutorial(tabKey) {
+            const info = tutorialData[tabKey];
+            if (!info) return;
+
+            const modal = document.getElementById('tutorialModal');
+            const content = document.getElementById('tutorialModalContent');
+            const header = document.getElementById('tutorialHeader');
+            const title = document.getElementById('tutorialTitle');
+            const subtitle = document.getElementById('tutorialSubtitle');
+            const stepsContainer = document.getElementById('tutorialSteps');
+            const badge = document.getElementById('tutorialBadge');
+            const confirmBtn = document.getElementById('tutorialConfirmBtn');
+
+            if (header) header.className = `${info.headerGradient} px-5 py-3.5 flex justify-between items-center text-white`;
+            if (title) title.innerHTML = `<i class="${tabKey === 'learn' ? 'fas fa-graduation-cap' : 'fas fa-gauge-high'}"></i> <span>${info.title}</span>`;
+            if (subtitle) subtitle.innerHTML = info.subtitle;
+            if (badge) badge.innerText = info.badge;
+            if (confirmBtn) {
+                confirmBtn.className = `${info.confirmBtnClass} font-bold py-2 px-5 rounded-xl shadow-lg transition text-xs flex items-center gap-1.5`;
+            }
+
+            if (stepsContainer) {
+                stepsContainer.innerHTML = '';
+                info.steps.forEach(step => {
+                    const stepItem = document.createElement('div');
+                    stepItem.className = 'flex items-start space-x-3 p-2.5 rounded-xl bg-slate-800/60 border border-slate-750/70';
+                    stepItem.innerHTML = `
+                        <div class="w-6 h-6 rounded-full ${tabKey === 'learn' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'} flex items-center justify-center font-bold text-xs shrink-0 font-mono">
+                            ${step.num}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-slate-200 text-xs mb-0.5">${step.title}</h4>
+                            <p class="text-slate-400 text-[11px] leading-relaxed">${step.desc}</p>
+                        </div>
+                    `;
+                    stepsContainer.appendChild(stepItem);
+                });
+            }
+
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+            setTimeout(() => {
+                if (content) {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }
+            }, 15);
+        }
+
+        function closeTutorial() {
+            const modal = document.getElementById('tutorialModal');
+            const content = document.getElementById('tutorialModalContent');
+            if (content) {
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+            }
+            setTimeout(() => {
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            }, 250);
         }
 
         function openQuizForm() {
