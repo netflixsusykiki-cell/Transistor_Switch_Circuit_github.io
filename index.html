@@ -159,7 +159,7 @@
                 </div>
             </div>
             
-            <!-- Creator Credit RGB Capsule Badge (Aligned Right) -->
+            <!-- Creator Credit RGB Capsule Badge -->
             <a href="https://www.facebook.com/kitti.nanth.rach.xun?locale=th_TH" target="_blank" rel="noopener noreferrer" title="ติดต่อผู้สร้าง: Kru Chopor"
                class="rgb-pill inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs tracking-wide shadow-md shrink-0 w-full sm:w-auto justify-center">
                 <span class="text-[10px] md:text-[11px] font-mono tracking-widest text-slate-400 font-semibold uppercase">CREATED BY</span>
@@ -198,7 +198,7 @@
                     </div>
                 </div>
 
-                <!-- SVG Container (Responsive native scaling) -->
+                <!-- SVG Container -->
                 <div class="w-full relative">
                     <svg id="circuitSvg" viewBox="0 0 950 550" class="w-full h-auto block select-none" preserveAspectRatio="xMidYMid meet">
                         
@@ -219,18 +219,13 @@
                             
                             <!-- Realistic Multimeter Probes (Pointing Down) -->
                             <g id="probe-red">
-                                <!-- Metal tip -->
                                 <path d="M 0 0 L 1.5 -5 L 1.5 -24 L -1.5 -24 L -1.5 -5 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="0.5"/>
-                                <!-- Handle pointing up -->
                                 <path d="M -5 -24 L 5 -24 L 6 -40 L 4 -85 L -4 -85 L -6 -40 Z" fill="#ef4444" stroke="#b91c1c" stroke-width="1.2"/>
-                                <!-- Finger guard -->
                                 <rect x="-9" y="-40" width="18" height="6" rx="3" fill="#dc2626" stroke="#991b1b" stroke-width="1"/>
-                                <!-- Grips -->
                                 <line x1="-4" y1="-50" x2="4" y2="-50" stroke="#991b1b" stroke-width="1.5"/>
                                 <line x1="-4" y1="-56" x2="4" y2="-56" stroke="#991b1b" stroke-width="1.5"/>
                                 <line x1="-4" y1="-62" x2="4" y2="-62" stroke="#991b1b" stroke-width="1.5"/>
                                 <line x1="-4" y1="-68" x2="4" y2="-68" stroke="#991b1b" stroke-width="1.5"/>
-                                <!-- Top wire exit -->
                                 <path d="M -3.5 -85 L 3.5 -85 L 2.5 -98 L -2.5 -98 Z" fill="#b91c1c"/>
                             </g>
                             <g id="probe-black">
@@ -245,9 +240,9 @@
                             </g>
                         </defs>
 
-                        <!-- Background Boxes (Drawn first to prevent wire overlap) -->
+                        <!-- Background Boxes (Drawn first) -->
                         <rect x="220" y="180" width="165" height="205" fill="#f8fafc" stroke="#2563eb" stroke-dasharray="5,5" stroke-width="1.5" rx="8"/>
-                        <!-- PULSE INPUT Box (Shifted down, gap preserved) -->
+                        <!-- PULSE INPUT Box -->
                         <rect x="225" y="405" width="155" height="60" fill="#faf5ff" stroke="#7e22ce" stroke-dasharray="5,5" stroke-width="1.5" rx="8"/>
                         <text x="302" y="420" text-anchor="middle" font-size="12" fill="#7e22ce" font-weight="bold">PULSE INPUT</text>
                         <text x="302" y="433" text-anchor="middle" font-size="11" fill="#7e22ce">0–5V DC</text>
@@ -264,7 +259,7 @@
                         <use href="#socket-red" x="180" y="80"/>
                         <text x="180" y="55" text-anchor="middle" font-size="18" font-weight="bold" fill="#dc2626">+5V</text>
 
-                        <!-- Power Supply Symbol (Text positioned on the lower left) -->
+                        <!-- Power Supply Symbol -->
                         <circle cx="80" cy="320" r="24" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"/>
                         <text x="80" y="314" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">+</text>
                         <text x="80" y="337" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">-</text>
@@ -282,7 +277,7 @@
                         <circle cx="170" cy="480" r="5" fill="#0f172a"/>
                         <circle cx="250" cy="300" r="5" fill="#0f172a"/>
 
-                        <!-- Pulse Wiring (Purple routing properly touching center of jack) -->
+                        <!-- Pulse Wiring -->
                         <polyline points="270,450 190,450 190,360 250,360" class="wire wire-purple"/>
                         <circle cx="250" cy="360" r="5" fill="#0f172a"/>
 
@@ -303,7 +298,7 @@
                         <circle cx="385" cy="300" r="5" fill="#0f172a"/>
                         <line x1="385" y1="300" x2="420" y2="300" class="wire"/>
 
-                        <!-- Pulse sockets (Moved to y=450 to clear GND) -->
+                        <!-- Pulse sockets -->
                         <text x="252" y="454" font-size="14" font-weight="bold" fill="#7e22ce">+</text>
                         <use href="#socket-purple" x="270" y="450"/>
                         
@@ -456,7 +451,7 @@
             </div>
         </section>
 
-        <!-- ================= LEFT/BOTTOM PANEL: CONTROLS & MEASUREMENTS ================= -->
+        <!-- Left/Bottom Panel: Controls & Measurements (Reordered for Mobile) -->
         <aside class="order-2 lg:order-1 w-full lg:w-[380px] xl:w-[410px] bg-slate-900/95 border-t lg:border-t-0 lg:border-r border-slate-800 flex flex-col shrink-0 custom-scrollbar z-20 shadow-2xl">
             
             <!-- Sticky Tabs -->
@@ -598,7 +593,7 @@
                             <span>ทบทวนความเข้าใจ</span>
                             <span id="quizBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono">ข้อ 1/3</span>
                         </div>
-                        <button id="quizDismissBtn" onclick="dismissQuiz()" class="hidden items-center text-[11px] text-red-300 hover:text-red-100 bg-red-900/40 border border-red-600/40 px-2 py-0.5 rounded transition">
+                        <button id="quizDismissBtn" onclick="dismissQuiz()" class="hidden items-center text-[11px] text-red-300 hover:text-red-100 bg-red-900/40 border border-red-600/40 px-2 py-0.5 rounded transition" title="ปิดหน้าต่าง">
                             <i class="fas fa-trash-alt mr-1"></i> ลบทิ้ง
                         </button>
                     </div>
@@ -828,7 +823,7 @@
                 <button onclick="closeInfo()" class="bg-cyan-600 text-slate-950 font-bold py-2 px-5 rounded-xl shadow text-xs">เข้าใจแล้ว</button>
             </div>
         </div> 
-    </div> <!-- CORRECTED: Closing tag for infoModal -->
+    </div>
 
     <!-- Registration Google Form Pop-up Modal -->
     <div id="googleFormModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100] hidden items-center justify-center p-4 transition-opacity">
@@ -838,8 +833,8 @@
                     <i class="fas fa-clipboard-user text-lg"></i> 
                     <span>ลงทะเบียนเข้าใช้งานชุดสาธิต</span>
                 </h3>
-                <button onclick="closeGoogleForm()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition focus:outline-none flex items-center justify-center">
-                    <i class="fas fa-times text-lg"></i>
+                <button onclick="closeGoogleForm()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition focus:outline-none flex items-center justify-center text-xs gap-1" title="ปิดหน้าต่าง">
+                    <span class="mr-1 hidden sm:inline">ปิด</span><i class="fas fa-times text-lg"></i>
                 </button>
             </div>
             <div class="flex-1 w-full bg-slate-50 relative">
@@ -870,8 +865,8 @@
                     <i class="fas fa-clipboard-list text-lg"></i> 
                     <span>แบบทดสอบประเมินความรู้</span>
                 </h3>
-                <button onclick="closeQuizForm()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition focus:outline-none flex items-center justify-center">
-                    <i class="fas fa-times text-lg"></i>
+                <button onclick="closeQuizForm()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition focus:outline-none flex items-center justify-center text-xs gap-1" title="ปิดหน้าต่าง">
+                    <span class="mr-1 hidden sm:inline">ปิด</span><i class="fas fa-times text-lg"></i>
                 </button>
             </div>
             <div class="flex-1 w-full bg-slate-50 relative">
@@ -919,35 +914,26 @@
         let currentSelectedTarget = '';
         let isProbesConnected = false;
 
-        // Quiz Questions Data (3 Questions)
+        // Quiz Questions Data
         let currentQuizIndex = 0;
         const quizList = [
             {
                 q: "เมื่อกระแส Base (IB) มีค่าใกล้ 0 mA ทรานซิสเตอร์ Q1 อยู่ในสภาวะใด?",
-                options: [
-                    "A. Saturation (อิ่มตัว)",
-                    "B. Cut-off (ตัดวงจร)"
-                ],
+                options: ["A. Saturation (อิ่มตัว)", "B. Cut-off (ตัดวงจร)"],
                 correct: 1,
                 feedbackCorrect: "ถูกต้อง! เมื่อไม่มีกระแส Base (IB ≈ 0) ทรานซิสเตอร์จะไม่นำกระแส เรียกว่าสภาวะ Cut-off หรือเสมือนสวิตช์เปิดวงจร",
                 feedbackWrong: "ยังไม่ถูกต้อง: หากไม่มีกระแสมากระตุ้นที่ขา Base ทรานซิสเตอร์จะไม่ยอมให้กระแสผ่าน จะอยู่ในสภาวะตัดวงจร (Cut-off)"
             },
             {
                 q: "เมื่อป้อนแรงดัน Vin = 5V จน Q1 อิ่มตัว (Saturation) แรงดัน VCE จะมีค่าประมาณเท่าใด?",
-                options: [
-                    "A. มีค่าต่ำมากประมาณ 0.1 - 0.3 V",
-                    "B. มีค่าสูงเท่ากับแหล่งจ่ายประมาณ 5.0 V"
-                ],
+                options: ["A. มีค่าต่ำมากประมาณ 0.1 - 0.3 V", "B. มีค่าสูงเท่ากับแหล่งจ่ายประมาณ 5.0 V"],
                 correct: 0,
                 feedbackCorrect: "ถูกต้อง! ในสภาวะ Saturation ขา C และ E เสมือนลัดวงจรถึงกัน (สวิตช์ปิด) แรงดันตกคร่อม VCE จึงลดลงต่ำมากเหลือเพียง 0.1 - 0.3 V",
                 feedbackWrong: "ยังไม่ถูกต้อง: ในสภาวะอิ่มตัว (Saturation) ทรานซิสเตอร์เปรียบเสมือนสวิตช์ปิดวงจร แรงดันตกคร่อม VCE จะต่ำมาก (< 0.5 V)"
             },
             {
                 q: "หากต้องการวัดกระแสโหลดหลัก (IC) ต้องต่อเครื่องวัดอย่างไร?",
-                options: [
-                    "A. ต่อโวลต์มิเตอร์แบบขนานคร่อมจุด C และ E",
-                    "B. ถอดสายจั๊มเปอร์แล้วต่อแอมมิเตอร์แบบอนุกรม"
-                ],
+                options: ["A. ต่อโวลต์มิเตอร์แบบขนานคร่อมจุด C และ E", "B. ถอดสายจั๊มเปอร์แล้วต่อแอมมิเตอร์แบบอนุกรม"],
                 correct: 1,
                 feedbackCorrect: "ถูกต้อง! การวัดกระแส (IC) จะต้องปลดสายจั๊มเปอร์ออก แล้วนำแอมมิเตอร์มาต่อแบบอนุกรมในเส้นทางไหลของกระแส Collector",
                 feedbackWrong: "ยังไม่ถูกต้อง: การวัดกระแสไฟฟ้าต้องแทรกแอมมิเตอร์เข้าไปในวงจรแบบอนุกรม โดยต้องปลดสายจั๊มเปอร์ออกก่อน"
@@ -1038,72 +1024,12 @@
             }
         };
 
-        // Initialize Google Form Handlers
-        let gformLoadCount = 0;
-        function handleFormLoad() {
-            const loader = document.getElementById('formLoading');
-            if (loader) loader.style.display = 'none';
-            
-            gformLoadCount++;
-            // Forms reload the iframe on submission
-            if (gformLoadCount > 1) {
-                setTimeout(() => {
-                    closeGoogleForm();
-                    showMsgBox("เข้าสู่บทเรียน", "บันทึกข้อมูลเข้าใช้งานเรียบร้อยแล้ว ขอให้สนุกกับการเรียนรู้ชุดสาธิตครับ", "success");
-                }, 2000); 
-            }
-        }
-
-        function closeGoogleForm() {
-            const modal = document.getElementById('googleFormModal');
-            if (modal) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
-        }
-
-        let quizFormLoadCount = 0;
-        function openQuizForm() {
-            quizFormLoadCount = 0; 
-            const iframe = document.getElementById('quizIframe');
-            const loader = document.getElementById('quizFormLoading');
-            if(loader) loader.style.display = 'flex';
-            
-            // Reload the form to ensure a fresh session
-            iframe.src = "https://docs.google.com/forms/d/e/1FAIpQLSfFbGOdD5TpuWdYWvfdS7X6dsEPGVMrBXkyH1sHP79VLqlN5Q/viewform?embedded=true";
-            
-            const modal = document.getElementById('quizFormModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeQuizForm() {
-            const modal = document.getElementById('quizFormModal');
-            if (modal) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
-        }
-
-        function handleQuizFormLoad() {
-            const loader = document.getElementById('quizFormLoading');
-            if (loader) loader.style.display = 'none';
-            
-            quizFormLoadCount++;
-            if (quizFormLoadCount > 1) {
-                setTimeout(() => {
-                    closeQuizForm();
-                    showMsgBox("ส่งคำตอบสำเร็จ", "บันทึกผลการทำแบบทดสอบประเมินความรู้ของคุณเรียบร้อยแล้ว ขอบคุณครับ", "success");
-                }, 2000);
-            }
-        }
-
         window.onload = function() {
             initChart();
             changeMode('off');
             renderQuiz();
             
-            // Trigger Registration Form on load
+            // Show Registration Google Form on load
             const formModal = document.getElementById('googleFormModal');
             if(formModal) {
                 formModal.classList.remove('hidden');
@@ -1119,20 +1045,21 @@
             const contentMeasure = document.getElementById('content-measure');
 
             if (tabId === 'learn') {
-                tabLearn.className = "flex items-center justify-center py-2.5 px-3 rounded-lg font-semibold text-xs transition duration-200 bg-cyan-600 text-white shadow-md shadow-cyan-600/30";
-                tabMeasure.className = "flex items-center justify-center py-2.5 px-3 rounded-lg font-semibold text-xs transition duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60";
+                tabLearn.className = "flex items-center justify-center py-2.5 px-2 rounded-lg font-semibold text-xs transition duration-200 bg-cyan-600 text-white shadow-md shadow-cyan-600/30";
+                tabMeasure.className = "flex items-center justify-center py-2.5 px-2 rounded-lg font-semibold text-xs transition duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60";
                 contentLearn.classList.remove('hidden');
                 contentMeasure.classList.add('hidden');
                 isProbesConnected = false;
                 hideAllMeterGuides();
             } else {
-                tabMeasure.className = "flex items-center justify-center py-2.5 px-3 rounded-lg font-semibold text-xs transition duration-200 bg-cyan-600 text-white shadow-md shadow-cyan-600/30";
-                tabLearn.className = "flex items-center justify-center py-2.5 px-3 rounded-lg font-semibold text-xs transition duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60";
+                tabMeasure.className = "flex items-center justify-center py-2.5 px-2 rounded-lg font-semibold text-xs transition duration-200 bg-cyan-600 text-white shadow-md shadow-cyan-600/30";
+                tabLearn.className = "flex items-center justify-center py-2.5 px-2 rounded-lg font-semibold text-xs transition duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60";
                 contentMeasure.classList.remove('hidden');
                 contentLearn.classList.add('hidden');
                 isProbesConnected = false;
                 hideAllMeterGuides();
-                document.getElementById('measureFeedback').classList.add('hidden');
+                const measureFeedback = document.getElementById('measureFeedback');
+                if (measureFeedback) measureFeedback.classList.add('hidden');
             }
         }
 
@@ -1140,13 +1067,13 @@
             const badge = document.getElementById('circuitLiveBadge');
             if (!badge) return;
             if (color === 'red') {
-                badge.className = "hidden sm:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 text-xs font-semibold";
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-400 animate-ping"></span><span id="badgeStateText">${text}</span>`;
+                badge.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 text-xs md:text-sm font-semibold shrink-0 shadow-sm";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span><span id="badgeStateText">${text}</span>`;
             } else if (color === 'emerald') {
-                badge.className = "hidden sm:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-semibold";
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span><span id="badgeStateText">${text}</span>`;
+                badge.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 text-xs md:text-sm font-semibold shrink-0 shadow-sm";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span><span id="badgeStateText">${text}</span>`;
             } else if (color === 'purple') {
-                badge.className = "hidden sm:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/30 text-xs font-semibold";
+                badge.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/30 text-xs md:text-sm font-semibold shrink-0 shadow-sm";
                 badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span><span id="badgeStateText">${text}</span>`;
             }
         }
@@ -1154,6 +1081,8 @@
         function showMsgBox(title, text, type = 'info') {
             const box = document.getElementById('msgBox');
             const icon = document.getElementById('msgIcon');
+            if (!box || !icon) return;
+
             document.getElementById('msgTitle').innerText = title;
             document.getElementById('msgText').innerHTML = text;
             
@@ -1172,8 +1101,11 @@
         }
 
         function closeMsgBox() {
-            document.getElementById('msgBox').classList.add('hidden');
-            document.getElementById('msgBox').classList.remove('flex');
+            const box = document.getElementById('msgBox');
+            if (box) {
+                box.classList.add('hidden');
+                box.classList.remove('flex');
+            }
         }
 
         function changeMode(mode) {
@@ -1199,33 +1131,33 @@
             const toggleArmInner = document.getElementById('switch-arm-inner');
             const pulseControls = document.getElementById('pulseControls');
 
-            pulseControls.classList.add('hidden');
+            if (pulseControls) pulseControls.classList.add('hidden');
 
             if (mode === 'off') {
-                toggleArm.setAttribute('x2', '285');
-                toggleArm.setAttribute('y2', '300');
-                toggleArmInner.setAttribute('x2', '285');
-                toggleArmInner.setAttribute('y2', '300');
+                if(toggleArm) toggleArm.setAttribute('x2', '285');
+                if(toggleArm) toggleArm.setAttribute('y2', '300');
+                if(toggleArmInner) toggleArmInner.setAttribute('x2', '285');
+                if(toggleArmInner) toggleArmInner.setAttribute('y2', '300');
                 setCircuitState(false);
                 updateStatusPanel("CUT-OFF (OFF)", "ไม่มีกระแส Base → Transistor ไม่นำกระแส → LED ดับ", "text-red-400", "bg-red-950/40", "border-red-500/30");
                 updateLiveBadge("Cut-off (OFF)", "red");
                 
             } else if (mode === 'on') {
-                toggleArm.setAttribute('x2', '290');
-                toggleArm.setAttribute('y2', '250');
-                toggleArmInner.setAttribute('x2', '290');
-                toggleArmInner.setAttribute('y2', '250');
+                if(toggleArm) toggleArm.setAttribute('x2', '290');
+                if(toggleArm) toggleArm.setAttribute('y2', '250');
+                if(toggleArmInner) toggleArmInner.setAttribute('x2', '290');
+                if(toggleArmInner) toggleArmInner.setAttribute('y2', '250');
                 setCircuitState(true);
                 updateStatusPanel("SATURATION (ON)", "มีกระแส Base → Q1 นำกระแส → กระแส IC ไหล → LED ติด", "text-emerald-400", "bg-emerald-950/40", "border-emerald-500/30");
                 closeGraphModal();
                 updateLiveBadge("Saturation (ON)", "emerald");
                 
             } else if (mode === 'pulse') {
-                toggleArm.setAttribute('x2', '290');
-                toggleArm.setAttribute('y2', '350');
-                toggleArmInner.setAttribute('x2', '290');
-                toggleArmInner.setAttribute('y2', '350');
-                pulseControls.classList.remove('hidden');
+                if(toggleArm) toggleArm.setAttribute('x2', '290');
+                if(toggleArm) toggleArm.setAttribute('y2', '350');
+                if(toggleArmInner) toggleArmInner.setAttribute('x2', '290');
+                if(toggleArmInner) toggleArmInner.setAttribute('y2', '350');
+                if(pulseControls) pulseControls.classList.remove('hidden');
                 
                 pulseState = false;
                 startPulse();
@@ -1254,35 +1186,57 @@
                     if (flowGroupPulse) flowGroupPulse.classList.add('hidden');
                 }
 
-                ledDome.classList.replace('led-off', 'led-on');
-                ledRays.classList.remove('hidden');
-                document.getElementById('q1Status').innerText = "Saturation (Closed)";
-                document.getElementById('q1Status').className = "font-bold font-mono text-emerald-400";
-                document.getElementById('ledStatus').innerText = "ON (สว่าง)";
-                document.getElementById('ledStatus').className = "font-bold font-mono text-emerald-400";
-                q1ActiveBadge.innerText = "Saturation";
-                q1ActiveBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 font-bold";
+                if(ledDome) ledDome.classList.replace('led-off', 'led-on');
+                if(ledRays) ledRays.classList.remove('hidden');
                 
+                const q1s = document.getElementById('q1Status');
+                if(q1s) {
+                    q1s.innerText = "Saturation (Closed)";
+                    q1s.className = "font-bold font-mono text-emerald-400";
+                }
+                const leds = document.getElementById('ledStatus');
+                if(leds) {
+                    leds.innerText = "ON (สว่าง)";
+                    leds.className = "font-bold font-mono text-emerald-400";
+                }
+                
+                if(q1ActiveBadge) {
+                    q1ActiveBadge.innerText = "Saturation";
+                    q1ActiveBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 font-bold";
+                }
             } else {
                 if (flowGroupOn) flowGroupOn.classList.add('hidden');
                 if (flowGroupPulse) flowGroupPulse.classList.add('hidden');
 
-                ledDome.classList.replace('led-on', 'led-off');
-                ledRays.classList.add('hidden');
-                document.getElementById('q1Status').innerText = "Cut-off (Open)";
-                document.getElementById('q1Status').className = "font-bold font-mono text-red-400";
-                document.getElementById('ledStatus').innerText = "OFF (ดับ)";
-                document.getElementById('ledStatus').className = "font-bold font-mono text-red-400";
-                q1ActiveBadge.innerText = "Cut-off";
-                q1ActiveBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-red-500/20 text-red-400 font-bold";
+                if(ledDome) ledDome.classList.replace('led-on', 'led-off');
+                if(ledRays) ledRays.classList.add('hidden');
+                
+                const q1s = document.getElementById('q1Status');
+                if(q1s) {
+                    q1s.innerText = "Cut-off (Open)";
+                    q1s.className = "font-bold font-mono text-red-400";
+                }
+                const leds = document.getElementById('ledStatus');
+                if(leds) {
+                    leds.innerText = "OFF (ดับ)";
+                    leds.className = "font-bold font-mono text-red-400";
+                }
+                
+                if(q1ActiveBadge) {
+                    q1ActiveBadge.innerText = "Cut-off";
+                    q1ActiveBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-red-500/20 text-red-400 font-bold";
+                }
             }
         }
 
         function updateStatusPanel(status, desc, colorClass, bgClass, borderClass) {
             const statusMsg = document.getElementById('statusMessage');
-            statusMsg.innerText = `วงจรอยู่ในสภาวะ ${status}`;
-            statusMsg.className = `text-center font-bold text-sm p-2.5 rounded-lg mb-2.5 border ${colorClass} ${bgClass} ${borderClass}`;
-            document.getElementById('statusDescription').innerText = desc;
+            if(statusMsg) {
+                statusMsg.innerText = `วงจรอยู่ในสภาวะ ${status}`;
+                statusMsg.className = `text-center font-bold text-sm p-2.5 rounded-lg mb-2.5 border ${colorClass} ${bgClass} ${borderClass}`;
+            }
+            const descEl = document.getElementById('statusDescription');
+            if(descEl) descEl.innerText = desc;
         }
 
         function togglePulsePause() {
@@ -1292,8 +1246,10 @@
             const triggerBadge = document.getElementById('dsoTriggerState');
             
             if (isPulsePaused) {
-                btn1.innerHTML = '<i class="fas fa-play text-xs"></i> <span>เล่นต่อ</span>';
-                btn1.className = "flex-1 py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center justify-center gap-1";
+                if(btn1) {
+                    btn1.innerHTML = '<i class="fas fa-play text-xs"></i> <span>เล่นต่อ</span>';
+                    btn1.className = "flex-1 py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center justify-center gap-1";
+                }
                 if(btn2) {
                     btn2.innerHTML = '<i class="fas fa-play text-xs"></i> <span>RUN</span>';
                     btn2.className = "flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow transition text-xs flex items-center justify-center gap-2";
@@ -1303,8 +1259,10 @@
                     triggerBadge.className = "text-amber-400 font-bold bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/40";
                 }
             } else {
-                btn1.innerHTML = '<i class="fas fa-pause text-xs"></i> <span>หยุดชั่วคราว</span>';
-                btn1.className = "flex-1 py-1.5 px-3 bg-amber-600/80 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow transition flex items-center justify-center gap-1";
+                if(btn1) {
+                    btn1.innerHTML = '<i class="fas fa-pause text-xs"></i> <span>หยุดชั่วคราว</span>';
+                    btn1.className = "flex-1 py-1.5 px-3 bg-amber-600/80 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow transition flex items-center justify-center gap-1";
+                }
                 if(btn2) {
                     btn2.innerHTML = '<i class="fas fa-pause text-xs"></i> <span>STOP</span>';
                     btn2.className = "flex-1 sm:flex-none px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow transition text-xs flex items-center justify-center gap-2";
@@ -1318,16 +1276,21 @@
 
         function syncFrequency(val) {
             val = Math.max(0.1, Math.min(10, parseFloat(val) || 1));
-            document.getElementById('freqSlider').value = val;
-            document.getElementById('freqInputText').value = val;
-            document.getElementById('modalFreqSlider').value = val;
+            const fs = document.getElementById('freqSlider');
+            const fit = document.getElementById('freqInputText');
+            const mfs = document.getElementById('modalFreqSlider');
+            if(fs) fs.value = val;
+            if(fit) fit.value = val;
+            if(mfs) mfs.value = val;
             updateFrequency(val);
         }
 
         function updateFrequency(val) {
             pulseFrequency = parseFloat(val);
-            document.getElementById('modalFreqValue').innerText = `${pulseFrequency.toFixed(1)} Hz`;
-            document.getElementById('dsoFreqReadout').innerText = `FREQ: ${pulseFrequency.toFixed(2)} Hz`;
+            const mfv = document.getElementById('modalFreqValue');
+            const dfr = document.getElementById('dsoFreqReadout');
+            if(mfv) mfv.innerText = `${pulseFrequency.toFixed(1)} Hz`;
+            if(dfr) dfr.innerText = `FREQ: ${pulseFrequency.toFixed(2)} Hz`;
             if (currentMode === 'pulse') {
                 clearInterval(pulseInterval);
                 startPulse();
@@ -1363,7 +1326,9 @@
         }
 
         function initChart() {
-            const ctx = document.getElementById('pulseGraphModal').getContext('2d');
+            const canvas = document.getElementById('pulseGraphModal');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -1385,20 +1350,13 @@
                     animation: false,
                     scales: {
                         y: { 
-                            min: -0.8, 
-                            max: 5.8, 
+                            min: -0.8, max: 5.8, 
                             ticks: { stepSize: 1, color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } },
                             grid: { color: 'rgba(51, 65, 85, 0.4)' }
                         },
-                        x: { 
-                            display: false,
-                            grid: { color: 'rgba(51, 65, 85, 0.3)' }
-                        }
+                        x: { display: false, grid: { color: 'rgba(51, 65, 85, 0.3)' } }
                     },
-                    plugins: { 
-                        legend: { display: false }, 
-                        tooltip: { enabled: false } 
-                    }
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
                 }
             });
         }
@@ -1406,15 +1364,19 @@
         function openGraphModal() {
             if(currentMode !== 'pulse') return;
             const modal = document.getElementById('graphModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            if(modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
             if(chartInstance) chartInstance.resize();
         }
 
         function closeGraphModal() {
             const modal = document.getElementById('graphModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            if(modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
         }
 
         function setMeterMode(mode) {
@@ -1426,19 +1388,23 @@
             const meterUnit = document.getElementById('meterUnit');
 
             if (mode === 'voltage') {
-                btnV.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-cyan-600 text-white shadow";
-                btnA.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-slate-800 text-slate-300 hover:bg-slate-750";
-                lcdMode.innerText = "DC VOLT";
-                meterUnit.innerText = "V";
+                if(btnV) btnV.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-cyan-600 text-white shadow";
+                if(btnA) btnA.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-slate-800 text-slate-300 hover:bg-slate-750";
+                if(lcdMode) lcdMode.innerText = "DC VOLT";
+                if(meterUnit) meterUnit.innerText = "V";
             } else {
-                btnA.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-cyan-600 text-white shadow";
-                btnV.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-slate-800 text-slate-300 hover:bg-slate-750";
-                lcdMode.innerText = "DC CURR";
-                meterUnit.innerText = "mA";
+                if(btnA) btnA.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-cyan-600 text-white shadow";
+                if(btnV) btnV.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-slate-800 text-slate-300 hover:bg-slate-750";
+                if(lcdMode) lcdMode.innerText = "DC CURR";
+                if(meterUnit) meterUnit.innerText = "mA";
             }
-            document.getElementById('meterDisplay').innerText = "0.00";
-            document.getElementById('meterBar').style.width = "0%";
-            document.getElementById('measureFeedback').classList.add('hidden');
+            
+            const display = document.getElementById('meterDisplay');
+            const bar = document.getElementById('meterBar');
+            const feedback = document.getElementById('measureFeedback');
+            if(display) display.innerText = "0.00";
+            if(bar) bar.style.width = "0%";
+            if(feedback) feedback.classList.add('hidden');
             hideAllMeterGuides();
         }
 
@@ -1447,22 +1413,29 @@
             isProbesConnected = false;
             ['VBE', 'VCE', 'IB', 'IC'].forEach(t => {
                 const btn = document.getElementById(`btnTarget-${t}`);
+                if(!btn) return;
                 if (t === target) {
                     btn.className = "py-2 px-2 text-xs font-bold rounded-lg border border-cyan-400 bg-cyan-500/20 text-cyan-300 shadow";
                 } else {
                     btn.className = "py-2 px-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-750 text-slate-300 transition";
                 }
             });
-            document.getElementById('meterDisplay').innerText = "0.00";
-            document.getElementById('meterBar').style.width = "0%";
-            document.getElementById('measureFeedback').classList.add('hidden');
+            const display = document.getElementById('meterDisplay');
+            const bar = document.getElementById('meterBar');
+            const feedback = document.getElementById('measureFeedback');
+            if(display) display.innerText = "0.00";
+            if(bar) bar.style.width = "0%";
+            if(feedback) feedback.classList.add('hidden');
             hideAllMeterGuides();
         }
 
         function hideAllMeterGuides() {
-            document.getElementById('active-probes').classList.add('hidden');
-            document.getElementById('wire-ib-jumper').style.opacity = '1';
-            document.getElementById('wire-ic-jumper').style.opacity = '1';
+            const probes = document.getElementById('active-probes');
+            const ibJump = document.getElementById('wire-ib-jumper');
+            const icJump = document.getElementById('wire-ic-jumper');
+            if(probes) probes.classList.add('hidden');
+            if(ibJump) ibJump.style.opacity = '1';
+            if(icJump) icJump.style.opacity = '1';
         }
 
         function performMeasurement(isAuto = false) {
@@ -1482,9 +1455,9 @@
             if (measurementMode === 'voltage' && (target === 'IB' || target === 'IC')) {
                 isProbesConnected = false;
                 hideAllMeterGuides();
-                display.innerText = "Err";
-                meterBar.style.width = "100%";
-                feedback.classList.add('hidden');
+                if(display) display.innerText = "Err";
+                if(meterBar) meterBar.style.width = "100%";
+                if(feedback) feedback.classList.add('hidden');
                 if(!isAuto) {
                     showMsgBox(
                         "ผิดโหมดการวัด (Measurement Error)",
@@ -1493,7 +1466,7 @@
                             <div class="bg-red-950/60 border border-red-500/40 p-2.5 rounded-lg text-red-200 text-xs">
                                 <strong><i class="fas fa-circle-info mr-1"></i> วิธีแก้ไขที่ถูกต้อง:</strong><br>
                                 1. ปรับโหมดเป็น <strong>DC Current (mA)</strong><br>
-                                2. แอมมิเตอร์ต้องต่อแบบ <strong>อนุกรม (Series)</strong> (ระบบจะจำลองการปลด Jumper)
+                                2. แอมมิเตอร์ต้องต่อแบบ <strong>อนุกรม (Series)</strong>
                             </div>
                         </div>`,
                         "error"
@@ -1501,12 +1474,13 @@
                 }
                 return;
             }
+            
             if (measurementMode === 'current' && (target === 'VBE' || target === 'VCE')) {
                 isProbesConnected = false;
                 hideAllMeterGuides();
-                display.innerText = "Err";
-                meterBar.style.width = "100%";
-                feedback.classList.add('hidden');
+                if(display) display.innerText = "Err";
+                if(meterBar) meterBar.style.width = "100%";
+                if(feedback) feedback.classList.add('hidden');
                 if(!isAuto) {
                     showMsgBox(
                         "ผิดโหมดการวัด (Measurement Error)",
@@ -1515,7 +1489,7 @@
                             <div class="bg-red-950/60 border border-red-500/40 p-2.5 rounded-lg text-red-200 text-xs">
                                 <strong><i class="fas fa-circle-info mr-1"></i> วิธีแก้ไขที่ถูกต้อง:</strong><br>
                                 1. ปรับโหมดเป็น <strong>DC Voltage (V)</strong><br>
-                                2. โวลต์มิเตอร์ต้องต่อแบบ <strong>ขนาน (Parallel)</strong> คร่อมจุดที่ต้องการวัด
+                                2. โวลต์มิเตอร์ต้องต่อแบบ <strong>ขนาน (Parallel)</strong>
                             </div>
                         </div>`,
                         "error"
@@ -1525,25 +1499,31 @@
             }
 
             isProbesConnected = true;
-
             hideAllMeterGuides();
+            
             if (target) {
                 const coords = probeCoords[target];
                 const probesGroup = document.getElementById('active-probes');
                 const probeRed = document.getElementById('probe-red-instance');
                 const probeBlack = document.getElementById('probe-black-instance');
                 
-                probesGroup.classList.remove('hidden');
-                probeRed.setAttribute('transform', `translate(${coords.rx}, ${coords.ry - 40})`);
-                probeBlack.setAttribute('transform', `translate(${coords.bx}, ${coords.by - 40})`);
+                if(probesGroup) probesGroup.classList.remove('hidden');
+                if(probeRed) probeRed.setAttribute('transform', `translate(${coords.rx}, ${coords.ry - 40})`);
+                if(probeBlack) probeBlack.setAttribute('transform', `translate(${coords.bx}, ${coords.by - 40})`);
                 
                 setTimeout(() => {
-                    probeRed.setAttribute('transform', `translate(${coords.rx}, ${coords.ry})`);
-                    probeBlack.setAttribute('transform', `translate(${coords.bx}, ${coords.by})`);
+                    if(probeRed) probeRed.setAttribute('transform', `translate(${coords.rx}, ${coords.ry})`);
+                    if(probeBlack) probeBlack.setAttribute('transform', `translate(${coords.bx}, ${coords.by})`);
                 }, 30);
 
-                if (target === 'IB') document.getElementById('wire-ib-jumper').style.opacity = '0';
-                if (target === 'IC') document.getElementById('wire-ic-jumper').style.opacity = '0';
+                if (target === 'IB') {
+                    const jump = document.getElementById('wire-ib-jumper');
+                    if(jump) jump.style.opacity = '0';
+                }
+                if (target === 'IC') {
+                    const jump = document.getElementById('wire-ic-jumper');
+                    if(jump) jump.style.opacity = '0';
+                }
             }
 
             let val = 0.00;
@@ -1561,33 +1541,33 @@
                 val += val * 0.01 * (Math.random() - 0.5);
             }
 
-            display.innerText = val.toFixed(2);
+            if(display) display.innerText = val.toFixed(2);
             
             const maxRef = measurementMode === 'voltage' ? 5.0 : 10.0;
             const pct = Math.min(100, Math.max(0, (val / maxRef) * 100));
-            meterBar.style.width = `${pct}%`;
+            if(meterBar) meterBar.style.width = `${pct}%`;
             
-            if (!isAuto) {
+            if (!isAuto && feedback) {
                 feedback.classList.remove('hidden');
                 if (target === 'IB' || target === 'IC') {
-                    feedback.className = "rounded-xl p-3.5 border text-xs leading-relaxed bg-cyan-950/40 border-cyan-500/40 text-cyan-200";
+                    feedback.className = "mt-3 rounded-xl p-3.5 border text-xs leading-relaxed transition-all bg-cyan-950/40 border-cyan-500/40 text-cyan-200";
                     feedback.innerHTML = `<strong><i class="fas fa-check-circle mr-1"></i> โหมดวัดกระแส (${target}):</strong> เสียบสายแบบ <strong>อนุกรม</strong> (ถอดสายจั๊มเปอร์ออก)<br>ค่าที่อ่านได้: <span class="font-mono font-bold text-cyan-300 text-sm">${val.toFixed(2)} mA</span>`;
                 } else {
-                    feedback.className = "rounded-xl p-3.5 border text-xs leading-relaxed bg-emerald-950/40 border-emerald-500/40 text-emerald-200";
+                    feedback.className = "mt-3 rounded-xl p-3.5 border text-xs leading-relaxed transition-all bg-emerald-950/40 border-emerald-500/40 text-emerald-200";
                     feedback.innerHTML = `<strong><i class="fas fa-check-circle mr-1"></i> โหมดวัดแรงดัน (${target}):</strong> เสียบสายวัดคร่อมจุดแบบ <strong>ขนาน</strong><br>ค่าที่อ่านได้: <span class="font-mono font-bold text-emerald-300 text-sm">${val.toFixed(2)} V</span>`;
                 }
             }
         }
 
         function checkRecords() {
-            const offLed = document.getElementById('rec-off-led').value;
-            const onLed = document.getElementById('rec-on-led').value;
-            const offVce = parseFloat(document.getElementById('rec-off-vce').value);
-            const onVce = parseFloat(document.getElementById('rec-on-vce').value);
+            const offLed = document.getElementById('rec-off-led')?.value;
+            const onLed = document.getElementById('rec-on-led')?.value;
+            const offVce = parseFloat(document.getElementById('rec-off-vce')?.value);
+            const onVce = parseFloat(document.getElementById('rec-on-vce')?.value);
             
             const feedback = document.getElementById('recordFeedback');
             const compareContainer = document.getElementById('compareTableContainer');
-            feedback.classList.remove('hidden');
+            if(feedback) feedback.classList.remove('hidden');
 
             let isMostlyCorrect = true;
             let msg = "";
@@ -1606,16 +1586,20 @@
             }
 
             if (isMostlyCorrect) {
-                feedback.className = "p-3 rounded-xl text-xs bg-emerald-950/50 text-emerald-300 border border-emerald-500/40 leading-relaxed";
-                feedback.innerHTML = "<strong><i class='fas fa-check-circle text-emerald-400'></i> ยอดเยี่ยมมาก!</strong> บันทึกผลได้ถูกต้องตามหลักการทำงาน ทฤษฎีเปรียบเทียบแสดงอยู่ด้านล่าง";
-                compareContainer.classList.remove('hidden');
+                if(feedback) {
+                    feedback.className = "p-3 rounded-xl text-xs bg-emerald-950/50 text-emerald-300 border border-emerald-500/40 leading-relaxed";
+                    feedback.innerHTML = "<strong><i class='fas fa-check-circle text-emerald-400'></i> ยอดเยี่ยมมาก!</strong> บันทึกผลได้ถูกต้องตามหลักการทำงาน ทฤษฎีเปรียบเทียบแสดงอยู่ด้านล่าง";
+                }
+                if(compareContainer) compareContainer.classList.remove('hidden');
                 setTimeout(() => {
-                    compareContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    if(compareContainer) compareContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }, 100);
             } else {
-                compareContainer.classList.add('hidden');
-                feedback.className = "p-3 rounded-xl text-xs bg-amber-950/50 text-amber-200 border border-amber-500/40 leading-relaxed";
-                feedback.innerHTML = "<strong><i class='fas fa-triangle-exclamation text-amber-400'></i> ตรวจสอบค่าอีกครั้ง:</strong><br>" + msg + "แนะนำให้ทดลองวัดค่าในวงจรอีกครั้งเพื่อยืนยันคำตอบครับ";
+                if(compareContainer) compareContainer.classList.add('hidden');
+                if(feedback) {
+                    feedback.className = "p-3 rounded-xl text-xs bg-amber-950/50 text-amber-200 border border-amber-500/40 leading-relaxed";
+                    feedback.innerHTML = "<strong><i class='fas fa-triangle-exclamation text-amber-400'></i> ตรวจสอบค่าอีกครั้ง:</strong><br>" + msg + "แนะนำให้ใช้มัลติมิเตอร์วัดค่าบนวงจรจริงเพื่อยืนยันคำตอบครับ";
+                }
             }
         }
 
@@ -1628,41 +1612,91 @@
             document.getElementById('modalFunction').innerHTML = info.func;
             
             const dataList = document.getElementById('modalData');
-            dataList.innerHTML = '';
-            info.data.forEach(item => {
-                const li = document.createElement('li');
-                li.innerHTML = item;
-                dataList.appendChild(li);
-            });
+            if(dataList) {
+                dataList.innerHTML = '';
+                info.data.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = item;
+                    dataList.appendChild(li);
+                });
+            }
 
             const warningBox = document.getElementById('modalWarningBox');
-            if (info.warning) {
-                warningBox.classList.remove('hidden');
-                document.getElementById('modalWarningText').innerHTML = info.warning;
-            } else {
-                warningBox.classList.add('hidden');
+            if (warningBox) {
+                if (info.warning) {
+                    warningBox.classList.remove('hidden');
+                    document.getElementById('modalWarningText').innerHTML = info.warning;
+                } else {
+                    warningBox.classList.add('hidden');
+                }
             }
 
             const modal = document.getElementById('infoModal');
             const content = document.getElementById('infoModalContent');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            
+            if(modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
             setTimeout(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
+                if(content) {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }
             }, 15);
         }
 
         function closeInfo() {
             const modal = document.getElementById('infoModal');
             const content = document.getElementById('infoModalContent');
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
+            if(content) {
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+            }
             setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
+                if(modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
             }, 250);
+        }
+
+        function answerQuiz(option) {
+            const feedback = document.getElementById('quizFeedback');
+            const dismissBtn = document.getElementById('quizDismissBtn');
+            const nextBtn = document.getElementById('quizNextBtn');
+            const q = quizList[currentQuizIndex];
+            
+            if (!q || !feedback) return;
+            feedback.classList.remove('hidden');
+
+            const btn0 = document.getElementById('quizBtn0');
+            const btn1 = document.getElementById('quizBtn1');
+            const chosenBtn = document.getElementById(`quizBtn${option}`);
+            
+            if (btn0) btn0.classList.remove('border-emerald-500', 'bg-emerald-950/40', 'border-red-500', 'bg-red-950/40', 'opacity-40');
+            if (btn1) btn1.classList.remove('border-emerald-500', 'bg-emerald-950/40', 'border-red-500', 'bg-red-950/40', 'opacity-40');
+            
+            if (option === q.correct) {
+                feedback.className = "mt-2 text-xs font-medium p-2 rounded-lg bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 leading-relaxed";
+                feedback.innerHTML = `<i class='fas fa-check text-emerald-400 mr-1'></i> <strong>ถูกต้อง!</strong> ${q.feedbackCorrect}`;
+                
+                if (chosenBtn) chosenBtn.classList.add('border-emerald-500', 'bg-emerald-950/40');
+                const otherBtn = document.getElementById(`quizBtn${option === 0 ? 1 : 0}`);
+                if (otherBtn) otherBtn.classList.add('opacity-40');
+                
+                if (currentQuizIndex === quizList.length - 1) {
+                    if (dismissBtn) { dismissBtn.classList.remove('hidden'); dismissBtn.classList.add('inline-flex'); }
+                    if (nextBtn) { nextBtn.classList.add('hidden'); nextBtn.classList.remove('inline-flex'); }
+                } else {
+                    if (dismissBtn) { dismissBtn.classList.add('hidden'); dismissBtn.classList.remove('inline-flex'); }
+                    if (nextBtn) { nextBtn.classList.remove('hidden'); nextBtn.classList.add('inline-flex'); }
+                }
+            } else {
+                feedback.className = "mt-2 text-xs font-medium p-2 rounded-lg bg-red-950/60 text-red-300 border border-red-500/40 leading-relaxed";
+                feedback.innerHTML = `<i class='fas fa-times text-red-400 mr-1'></i> <strong>ยังไม่ถูกต้อง:</strong> ${q.feedbackWrong}`;
+                if (chosenBtn) chosenBtn.classList.add('border-red-500', 'bg-red-950/40');
+                if (nextBtn) { nextBtn.classList.add('hidden'); nextBtn.classList.remove('inline-flex'); }
+            }
         }
 
         function renderQuiz() {
@@ -1689,75 +1723,9 @@
                 btn1.className = "text-left px-3 py-2 text-xs bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-200 transition";
             }
             
-            if (feedback) {
-                feedback.classList.add('hidden');
-                feedback.innerHTML = '';
-            }
-            
-            if (nextBtn) {
-                nextBtn.classList.add('hidden');
-                nextBtn.classList.remove('inline-flex');
-            }
-
-            if (dismissBtn) {
-                dismissBtn.classList.add('hidden');
-                dismissBtn.classList.remove('inline-flex');
-            }
-        }
-
-        function answerQuiz(option) {
-            const feedback = document.getElementById('quizFeedback');
-            const dismissBtn = document.getElementById('quizDismissBtn');
-            const nextBtn = document.getElementById('quizNextBtn');
-            const q = quizList[currentQuizIndex];
-            
-            if (!q || !feedback) return;
-            feedback.classList.remove('hidden');
-
-            const btn0 = document.getElementById('quizBtn0');
-            const btn1 = document.getElementById('quizBtn1');
-            const chosenBtn = document.getElementById(`quizBtn${option}`);
-            
-            if (btn0) btn0.classList.remove('border-emerald-500', 'bg-emerald-950/40', 'border-red-500', 'bg-red-950/40', 'opacity-40');
-            if (btn1) btn1.classList.remove('border-emerald-500', 'bg-emerald-950/40', 'border-red-500', 'bg-red-950/40', 'opacity-40');
-            
-            if (option === q.correct) {
-                feedback.className = "mt-2 text-xs font-medium p-2.5 rounded-lg bg-emerald-950/60 text-emerald-300 border border-emerald-500/40";
-                feedback.innerHTML = `<i class='fas fa-check text-emerald-400 mr-1'></i> <strong>ถูกต้อง!</strong> ${q.feedbackCorrect}`;
-                
-                if (chosenBtn) chosenBtn.classList.add('border-emerald-500', 'bg-emerald-950/40');
-                const other = option === 0 ? 1 : 0;
-                const otherBtn = document.getElementById(`quizBtn${other}`);
-                if (otherBtn) otherBtn.classList.add('opacity-40');
-                
-                if (currentQuizIndex === quizList.length - 1) {
-                    if (dismissBtn) {
-                        dismissBtn.classList.remove('hidden');
-                        dismissBtn.classList.add('inline-flex');
-                    }
-                    if (nextBtn) {
-                        nextBtn.classList.add('hidden');
-                        nextBtn.classList.remove('inline-flex');
-                    }
-                } else {
-                    if (dismissBtn) {
-                        dismissBtn.classList.add('hidden');
-                        dismissBtn.classList.remove('inline-flex');
-                    }
-                    if (nextBtn) {
-                        nextBtn.classList.remove('hidden');
-                        nextBtn.classList.add('inline-flex');
-                    }
-                }
-            } else {
-                feedback.className = "mt-2 text-xs font-medium p-2.5 rounded-lg bg-red-950/60 text-red-300 border border-red-500/40";
-                feedback.innerHTML = `<i class='fas fa-times text-red-400 mr-1'></i> <strong>ยังไม่ถูกต้อง:</strong> ${q.feedbackWrong}`;
-                if (chosenBtn) chosenBtn.classList.add('border-red-500', 'bg-red-950/40');
-                if (nextBtn) {
-                    nextBtn.classList.add('hidden');
-                    nextBtn.classList.remove('inline-flex');
-                }
-            }
+            if (feedback) { feedback.classList.add('hidden'); feedback.innerHTML = ''; }
+            if (nextBtn) { nextBtn.classList.add('hidden'); nextBtn.classList.remove('inline-flex'); }
+            if (dismissBtn) { dismissBtn.classList.add('hidden'); dismissBtn.classList.remove('inline-flex'); }
         }
 
         function nextQuizQuestion() {
@@ -1773,6 +1741,46 @@
                 quiz.classList.add('hidden');
                 quiz.classList.remove('flex');
             }
+        }
+
+        // Google Forms Functions
+        function handleFormLoad() {
+            const loader = document.getElementById('formLoading');
+            if (loader) loader.style.display = 'none';
+        }
+
+        function closeGoogleForm() {
+            const modal = document.getElementById('googleFormModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function openQuizForm() {
+            const iframe = document.getElementById('quizIframe');
+            const loader = document.getElementById('quizFormLoading');
+            if(loader) loader.style.display = 'flex';
+            if(iframe) iframe.src = "https://docs.google.com/forms/d/e/1FAIpQLSfFbGOdD5TpuWdYWvfdS7X6dsEPGVMrBXkyH1sHP79VLqlN5Q/viewform?embedded=true";
+            
+            const modal = document.getElementById('quizFormModal');
+            if(modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeQuizForm() {
+            const modal = document.getElementById('quizFormModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function handleQuizFormLoad() {
+            const loader = document.getElementById('quizFormLoading');
+            if (loader) loader.style.display = 'none';
         }
     </script>
 </body>
