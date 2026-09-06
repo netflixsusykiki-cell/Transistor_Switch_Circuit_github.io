@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ชุดสาธิตวงจรทรานซิสเตอร์สวิตซ์ | Transistor Switch Lab Simulator</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#0f172a', 950: '#020617' },
+                        tech: { accent: '#06b6d4', purple: '#a855f7' }
+                    },
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Courier New', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: #020617; /* Solid fallback */
+            background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0f172a 60%, #020617 100%);
+            color: #f1f5f9;
+        }
+
+        /* Multimeter & DSO Screens */
+        .lcd-display {
+            font-family: 'JetBrains Mono', monospace;
+            background: #142217;
+            color: #4ade80;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.6), 0 0 20px rgba(74, 222, 128, 0.2);
+            border: 2px solid #1e3a24;
+            box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(74, 222, 128, 0.15);
+        }
+        .dso-screen {
+            background-color: #030a16;
+            background-image: linear-gradient(rgba(14, 165, 233, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(14, 165, 233, 0.12) 1px, transparent 1px);
+            background-size: 25px 25px;
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.95);
+        }
+
+        /* Hardware Board */
+        .hardware-panel {
+            background: linear-gradient(145deg, #f8fafc 0%, #edf2f7 50%, #e2e8f0 100%);
+            border: 8px solid #94a3b8;
+            border-radius: 16px;
+            box-shadow: inset 0 2px 6px rgba(255,255,255,0.8), inset 0 -4px 10px rgba(0,0,0,0.2), 0 20px 40px -10px rgba(0,0,0,0.6), 0 0 0 2px #334155;
+            position: relative;
+        }
+        @media (min-width: 1024px) {
+            .hardware-panel { border-width: 10px; }
+        }
+
+        /* Metal Corners */
+        .metal-corner { position: absolute; width: 28px; height: 28px; border-color: #64748b; z-index: 10; }
+        .metal-corner::after {
+            content: ''; position: absolute; width: 8px; height: 8px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #e2e8f0, #475569);
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+        }
+        .corner-tl { top: 6px; left: 6px; border-top: 3px solid #64748b; border-left: 3px solid #64748b; } .corner-tl::after { top: 3px; left: 3px; }
+        .corner-tr { top: 6px; right: 6px; border-top: 3px solid #64748b; border-right: 3px solid #64748b; } .corner-tr::after { top: 3px; right: 3px; }
+        .corner-bl { bottom: 6px; left: 6px; border-bottom: 3px solid #64748b; border-left: 3px solid #64748b; } .corner-bl::after { bottom: 3px; left: 3px; }
+        .corner-br { bottom: 6px; right: 6px; border-bottom: 3px solid #64748b; border-right: 3px solid #64748b; } .corner-br::after { bottom: 3px; right: 3px; }
+
+        /* SVG Wiring & Paths */
+        .wire { stroke: #0f172a; stroke-width: 3.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .wire-red { stroke: #dc2626; filter: drop-shadow(0 0 1px rgba(220, 38, 38, 0.4)); }
+        .wire-black { stroke: #0f172a; }
+        .wire-purple { stroke: #7e22ce; }
+
+        /* Animations */
+        @keyframes flowBase { 0% { offset-distance: 0%; } 100% { offset-distance: 100%; } }
+        @keyframes flowBasePulse { 0% { offset-distance: 0%; } 100% { offset-distance: 100%; } }
+        @keyframes flowCollector { 0% { offset-distance: 0%; } 100% { offset-distance: 100%; } }
+        
+        .flow-path-b {
+            offset-path: path('M 170 80 L 170 240 L 250 240 L 340 300 L 420 300 L 520 300 L 550 300 L 610 300 L 670 300 L 705 330 L 705 480 L 80 480 L 80 80 L 170 80');
+            animation: flowBase 3s linear infinite;
+        }
+        .flow-path-b-pulse {
+            offset-path: path('M 270 450 L 190 450 L 190 360 L 250 360 L 341 300 L 420 300 L 520 300 L 550 300 L 610 300 L 670 300 L 705 330 L 705 480 L 335 480 L 335 450 L 270 450');
+            animation: flowBasePulse 2.6s linear infinite;
+        }
+        .flow-path-c {
+            offset-path: path('M 180 80 L 600 80 L 720 80 L 800 80 L 800 160 L 800 240 L 800 270 L 705 270 L 705 330 L 705 480 L 80 480 L 80 80 L 180 80');
+            animation: flowCollector 2.8s linear infinite;
+        }
+
+        .electron { fill: #ef4444; r: 5; filter: drop-shadow(0 0 5px #ef4444); }
+        .electron-pulse { fill: #a855f7; r: 5; filter: drop-shadow(0 0 6px #c084fc); }
+        .electron-pulse-c { fill: #fbbf24; r: 5; filter: drop-shadow(0 0 6px #f59e0b); }
+
+        /* Probes & Switch */
+        .probe-drop { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease; }
+        .switch-toggle { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), x2 0.3s ease, y2 0.3s ease; }
+
+        .led-off { fill: #991b1b; opacity: 0.38; }
+        .led-on { fill: #ef4444; opacity: 1; filter: drop-shadow(0 0 12px #ef4444) drop-shadow(0 0 28px #ef4444); }
+
+        .hotspot { fill: rgba(6, 182, 212, 0.08); stroke: #0284c7; stroke-width: 1.5; stroke-dasharray: 5,4; cursor: pointer; transition: all 0.25s ease; }
+        .hotspot:hover { fill: rgba(6, 182, 212, 0.28); stroke-width: 2.5; }
+
+        /* RGB Capsule Badge */
+        @keyframes rgbFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes rgbBorderGlow {
+            0% { border-color: rgba(236, 72, 153, 0.5); box-shadow: 0 0 14px rgba(236, 72, 153, 0.25); }
+            33% { border-color: rgba(59, 130, 246, 0.6); box-shadow: 0 0 14px rgba(59, 130, 246, 0.25); }
+            66% { border-color: rgba(34, 197, 94, 0.5); box-shadow: 0 0 14px rgba(34, 197, 94, 0.25); }
+            100% { border-color: rgba(236, 72, 153, 0.5); box-shadow: 0 0 14px rgba(236, 72, 153, 0.25); }
+        }
+        .rgb-text {
+            background: linear-gradient(90deg, #ec4899, #a855f7, #3b82f6, #06b6d4, #22c55e, #ec4899);
+            background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: rgbFlow 4s linear infinite; font-weight: 800;
+        }
+        .rgb-pill {
+            background: rgba(10, 15, 29, 0.85); border: 1px solid rgba(99, 102, 241, 0.35);
+            animation: rgbBorderGlow 5s ease-in-out infinite; transition: all 0.25s ease;
+        }
+        .rgb-pill:hover { transform: translateY(-1px) scale(1.02); box-shadow: 0 0 22px rgba(6, 182, 212, 0.45); }
+
+        /* Scrollbars */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 lg:h-screen lg:overflow-hidden">
+
+    <!-- Header Section -->
+    <header class="bg-slate-900/95 backdrop-blur border-b border-slate-800 shrink-0 z-30 shadow-lg px-4 py-3">
+        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center space-x-3 w-full sm:w-auto">
+                <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-tr from-cyan-600 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 ring-1 ring-white/20">
+                    <i class="fas fa-microchip text-xl text-white"></i>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="text-sm md:text-lg font-bold tracking-tight text-white truncate">
+                        ชุดสาธิตการวัดกระแสและแรงดันในวงจรทรานซิสเตอร์สวิตซ์
+                    </h1>
+                    <p class="text-[10px] md:text-xs text-slate-400 truncate">
+                        Demonstration Kit for Measuring Current and Voltage in a Transistor Switch Circuit
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Creator Credit RGB Capsule Badge (Aligned Right) -->
+            <a href="https://www.facebook.com/kitti.nanth.rach.xun?locale=th_TH" target="_blank" rel="noopener noreferrer" title="ติดต่อผู้สร้าง: Kru Chopor"
+               class="rgb-pill inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs tracking-wide shadow-md shrink-0 w-full sm:w-auto justify-center">
+                <span class="text-[10px] md:text-[11px] font-mono tracking-widest text-slate-400 font-semibold uppercase">CREATED BY</span>
+                <span class="rgb-text text-xs md:text-sm tracking-tight">KRU CHOPOR | Kittinan Rachoun</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Workspace (Responsive Split) -->
+    <main class="flex-1 flex flex-col lg:flex-row w-full min-h-0 relative">
+        
+        <!-- ================= RIGHT/TOP PANEL: CIRCUIT WORKBENCH ================= -->
+        <section class="order-1 lg:order-2 flex-1 flex flex-col p-2 sm:p-4 md:p-6 overflow-y-auto lg:h-full items-center justify-start lg:justify-center z-10 bg-slate-950">
+            
+            <div class="hardware-panel w-full max-w-5xl shrink-0 p-3 sm:p-4 md:p-8 relative">
+                <!-- Metallic Corners -->
+                <div class="metal-corner corner-tl"></div>
+                <div class="metal-corner corner-tr"></div>
+                <div class="metal-corner corner-bl"></div>
+                <div class="metal-corner corner-br"></div>
+
+                <!-- Panel Header with Integrated Live Badge -->
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 border-b border-slate-300 pb-3 gap-2">
+                    <div class="text-left">
+                        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-600/60 shadow-sm text-[10px] sm:text-xs text-slate-200 font-mono mb-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span>VOCATIONAL ELECTRONICS TRAINING PANEL</span>
+                        </div>
+                        <h2 class="text-lg md:text-2xl font-bold text-slate-800 tracking-wide">ชุดสาธิตวงจรทรานซิสเตอร์สวิตซ์</h2>
+                    </div>
+                    
+                    <!-- Integrated Status Badge -->
+                    <div id="circuitLiveBadge" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 text-xs md:text-sm font-semibold shrink-0 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                        <span id="badgeStateText">Cut-off (OFF)</span>
+                    </div>
+                </div>
+
+                <!-- SVG Container (Responsive native scaling) -->
+                <div class="w-full relative">
+                    <svg id="circuitSvg" viewBox="0 0 950 550" class="w-full h-auto block select-none" preserveAspectRatio="xMidYMid meet">
+                        
+                        <defs>
+                            <g id="resistor"><polyline points="0,0 10,-10 20,10 30,-10 40,10 50,-10 60,0" fill="none" stroke="#0f172a" stroke-width="3" stroke-linejoin="round"/></g>
+                            <g id="ground">
+                                <line x1="0" y1="0" x2="0" y2="15" stroke="#0f172a" stroke-width="3.5"/>
+                                <line x1="-16" y1="15" x2="16" y2="15" stroke="#0f172a" stroke-width="3.5"/>
+                                <line x1="-10" y1="22" x2="10" y2="22" stroke="#0f172a" stroke-width="3.5"/>
+                                <line x1="-4" y1="29" x2="4" y2="29" stroke="#0f172a" stroke-width="3.5"/>
+                            </g>
+                            
+                            <!-- Terminal Socket Graphics -->
+                            <g id="socket-red"><circle cx="0" cy="0" r="11" fill="#dc2626" stroke="#991b1b" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#1e293b"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
+                            <g id="socket-black"><circle cx="0" cy="0" r="11" fill="#1e293b" stroke="#020617" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#0f172a"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
+                            <g id="socket-blue"><circle cx="0" cy="0" r="11" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#1e293b"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
+                            <g id="socket-purple"><circle cx="0" cy="0" r="11" fill="#7e22ce" stroke="#581c87" stroke-width="2"/><circle cx="0" cy="0" r="6" fill="#1e293b"/><circle cx="0" cy="0" r="3" fill="#000000"/></g>
+                            
+                            <!-- Realistic Multimeter Probes (Pointing Down) -->
+                            <g id="probe-red">
+                                <!-- Metal tip -->
+                                <path d="M 0 0 L 1.5 -5 L 1.5 -24 L -1.5 -24 L -1.5 -5 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="0.5"/>
+                                <!-- Handle pointing up -->
+                                <path d="M -5 -24 L 5 -24 L 6 -40 L 4 -85 L -4 -85 L -6 -40 Z" fill="#ef4444" stroke="#b91c1c" stroke-width="1.2"/>
+                                <!-- Finger guard -->
+                                <rect x="-9" y="-40" width="18" height="6" rx="3" fill="#dc2626" stroke="#991b1b" stroke-width="1"/>
+                                <!-- Grips -->
+                                <line x1="-4" y1="-50" x2="4" y2="-50" stroke="#991b1b" stroke-width="1.5"/>
+                                <line x1="-4" y1="-56" x2="4" y2="-56" stroke="#991b1b" stroke-width="1.5"/>
+                                <line x1="-4" y1="-62" x2="4" y2="-62" stroke="#991b1b" stroke-width="1.5"/>
+                                <line x1="-4" y1="-68" x2="4" y2="-68" stroke="#991b1b" stroke-width="1.5"/>
+                                <!-- Top wire exit -->
+                                <path d="M -3.5 -85 L 3.5 -85 L 2.5 -98 L -2.5 -98 Z" fill="#b91c1c"/>
+                            </g>
+                            <g id="probe-black">
+                                <path d="M 0 0 L 1.5 -5 L 1.5 -24 L -1.5 -24 L -1.5 -5 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="0.5"/>
+                                <path d="M -5 -24 L 5 -24 L 6 -40 L 4 -85 L -4 -85 L -6 -40 Z" fill="#1e293b" stroke="#020617" stroke-width="1.2"/>
+                                <rect x="-9" y="-40" width="18" height="6" rx="3" fill="#0f172a" stroke="#020617" stroke-width="1"/>
+                                <line x1="-4" y1="-50" x2="4" y2="-50" stroke="#020617" stroke-width="1.5"/>
+                                <line x1="-4" y1="-56" x2="4" y2="-56" stroke="#020617" stroke-width="1.5"/>
+                                <line x1="-4" y1="-62" x2="4" y2="-62" stroke="#020617" stroke-width="1.5"/>
+                                <line x1="-4" y1="-68" x2="4" y2="-68" stroke="#020617" stroke-width="1.5"/>
+                                <path d="M -3.5 -85 L 3.5 -85 L 2.5 -98 L -2.5 -98 Z" fill="#020617"/>
+                            </g>
+                        </defs>
+
+                        <!-- Background Boxes (Drawn first to prevent wire overlap) -->
+                        <rect x="220" y="180" width="165" height="205" fill="#f8fafc" stroke="#2563eb" stroke-dasharray="5,5" stroke-width="1.5" rx="8"/>
+                        <!-- PULSE INPUT Box (Shifted down, gap preserved) -->
+                        <rect x="225" y="405" width="155" height="60" fill="#faf5ff" stroke="#7e22ce" stroke-dasharray="5,5" stroke-width="1.5" rx="8"/>
+                        <text x="302" y="420" text-anchor="middle" font-size="12" fill="#7e22ce" font-weight="bold">PULSE INPUT</text>
+                        <text x="302" y="433" text-anchor="middle" font-size="11" fill="#7e22ce">0–5V DC</text>
+                        <text x="300" y="208" text-anchor="middle" font-size="16" fill="#1d4ed8" font-weight="bold">INPUT SELECT</text>
+
+                        <!-- Rails & Main Power -->
+                        <polyline points="80,480 880,480" class="wire wire-black"/>
+                        <line x1="80" y1="480" x2="80" y2="505" class="wire wire-black"/> <!-- Ground connection -->
+                        <use href="#socket-black" x="80" y="480"/>
+                        <use href="#ground" x="80" y="505"/>
+                        <text x="80" y="545" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">GND</text>
+
+                        <polyline points="80,80 600,80" class="wire wire-red"/>
+                        <use href="#socket-red" x="180" y="80"/>
+                        <text x="180" y="55" text-anchor="middle" font-size="18" font-weight="bold" fill="#dc2626">+5V</text>
+
+                        <!-- Power Supply Symbol (Text positioned on the lower left) -->
+                        <circle cx="80" cy="320" r="24" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"/>
+                        <text x="80" y="314" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">+</text>
+                        <text x="80" y="337" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">-</text>
+                        <text x="65" y="380" text-anchor="end" font-size="15" font-weight="bold" fill="#0f172a">+5V DC</text>
+                        
+                        <line x1="80" y1="344" x2="80" y2="480" class="wire wire-black"/>
+                        <line x1="80" y1="296" x2="80" y2="80" class="wire wire-red"/>
+
+                        <!-- Wiring into INPUT SELECT -->
+                        <polyline points="170,80 170,240 250,240" class="wire wire-red"/>
+                        <circle cx="170" cy="80" r="5" fill="#dc2626"/>
+                        <circle cx="250" cy="240" r="5" fill="#dc2626"/>
+
+                        <polyline points="170,480 170,300 250,300" class="wire wire-black"/>
+                        <circle cx="170" cy="480" r="5" fill="#0f172a"/>
+                        <circle cx="250" cy="300" r="5" fill="#0f172a"/>
+
+                        <!-- Pulse Wiring (Purple routing properly touching center of jack) -->
+                        <polyline points="270,450 190,450 190,360 250,360" class="wire wire-purple"/>
+                        <circle cx="250" cy="360" r="5" fill="#0f172a"/>
+
+                        <!-- Input Select Labels -->
+                        <text x="265" y="244" font-size="14" font-weight="bold" fill="#16a34a">ON (5V)</text>
+                        <text x="265" y="296" font-size="13" font-weight="bold" fill="#1f2937">OFF</text>
+                        <text x="265" y="312" font-size="11" fill="#4b5563">(0V / GND)</text>
+                        <text x="265" y="358" font-size="13" font-weight="bold" fill="#7e22ce">PULSE</text>
+                        <text x="265" y="374" font-size="11" fill="#7e22ce">(0–5V DC)</text>
+
+                        <!-- Toggle Switch -->
+                        <rect x="330" y="270" width="22" height="60" rx="11" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/>
+                        <circle cx="341" cy="300" r="6" fill="#334155"/>
+                        <line id="switch-arm" x1="341" y1="300" x2="285" y2="300" stroke="#94a3b8" stroke-width="8" stroke-linecap="round" class="switch-toggle"/>
+                        <line id="switch-arm-inner" x1="341" y1="300" x2="285" y2="300" stroke="#f8fafc" stroke-width="3" stroke-linecap="round" class="switch-toggle"/>
+
+                        <line x1="341" y1="300" x2="385" y2="300" class="wire"/>
+                        <circle cx="385" cy="300" r="5" fill="#0f172a"/>
+                        <line x1="385" y1="300" x2="420" y2="300" class="wire"/>
+
+                        <!-- Pulse sockets (Moved to y=450 to clear GND) -->
+                        <text x="252" y="454" font-size="14" font-weight="bold" fill="#7e22ce">+</text>
+                        <use href="#socket-purple" x="270" y="450"/>
+                        
+                        <text x="352" y="454" font-size="14" font-weight="bold" fill="#1f2937">-</text>
+                        <use href="#socket-black" x="335" y="450"/>
+                        <line x1="335" y1="450" x2="335" y2="480" class="wire wire-black"/>
+                        <circle cx="335" cy="480" r="5" fill="#0f172a"/>
+
+                        <!-- Base Path -->
+                        <use href="#socket-blue" x="420" y="300"/>
+                        <text x="410" y="275" font-size="18" font-weight="bold" fill="#2563eb">+</text>
+                        <text x="470" y="275" text-anchor="middle" font-size="20" font-weight="bold" fill="#1d4ed8">I<tspan baseline-shift="sub" font-size="14">B</tspan></text>
+
+                        <!-- IB Jumper -->
+                        <line id="wire-ib-jumper" x1="420" y1="300" x2="520" y2="300" stroke="#0f172a" stroke-width="2.5" stroke-dasharray="8,4"/>
+                        <text x="470" y="325" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">Insert Ammeter</text>
+                        <text x="470" y="340" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">for I<tspan baseline-shift="sub" font-size="10">B</tspan></text>
+
+                        <use href="#socket-black" x="520" y="300"/>
+                        <text x="520" y="275" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f172a">COM</text>
+
+                        <line x1="520" y1="300" x2="550" y2="300" class="wire"/>
+                        <use href="#resistor" x="550" y="300"/>
+                        <text x="580" y="275" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f172a">R<tspan baseline-shift="sub" font-size="12">B</tspan></text>
+                        <text x="580" y="325" text-anchor="middle" font-size="14" fill="#0f172a">4.7kΩ</text>
+                        <line x1="610" y1="300" x2="670" y2="300" class="wire"/>
+
+                        <!-- Collector Path -->
+                        <use href="#socket-red" x="600" y="80"/>
+                        <text x="585" y="60" font-size="18" font-weight="bold" fill="#dc2626">+</text>
+                        <text x="660" y="55" text-anchor="middle" font-size="20" font-weight="bold" fill="#1d4ed8">I<tspan baseline-shift="sub" font-size="14">C</tspan></text>
+
+                        <!-- IC Jumper -->
+                        <line id="wire-ic-jumper" x1="600" y1="80" x2="720" y2="80" stroke="#0f172a" stroke-width="2.5" stroke-dasharray="8,4"/>
+                        <text x="660" y="105" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">Insert Ammeter</text>
+                        <text x="660" y="120" text-anchor="middle" font-size="12" fill="#1d4ed8" font-weight="500">for I<tspan baseline-shift="sub" font-size="10">C</tspan></text>
+
+                        <use href="#socket-black" x="720" y="80"/>
+                        <text x="720" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f172a">COM</text>
+
+                        <polyline points="720,80 800,80 800,100" class="wire"/>
+                        <use href="#resistor" transform="translate(800, 100) rotate(90)"/>
+                        <text x="830" y="130" font-size="16" font-weight="bold" fill="#0f172a">R<tspan baseline-shift="sub" font-size="12">LED</tspan></text>
+                        <text x="830" y="150" font-size="14" fill="#0f172a">330Ω</text>
+                        <line x1="800" y1="160" x2="800" y2="180" class="wire"/>
+
+                        <!-- LED Component -->
+                        <g id="led-visual" transform="translate(800, 200)">
+                            <path d="M-20,10 C-20,-10 -15,-20 0,-20 C15,-20 20,-10 20,10 Z" class="led-off" id="led-dome" stroke="#991b1b" stroke-width="2"/>
+                            <rect x="-24" y="10" width="48" height="6" fill="#991b1b" rx="2"/>
+                            <line x1="-8" y1="16" x2="-8" y2="40" stroke="#0f172a" stroke-width="4"/>
+                            <line x1="8" y1="16" x2="8" y2="40" stroke="#0f172a" stroke-width="4"/>
+                            <g id="led-rays" class="hidden" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round">
+                                <line x1="30" y1="-15" x2="45" y2="-25" /> <polygon points="45,-25 40,-27 43,-21" fill="#ef4444"/>
+                                <line x1="35" y1="10" x2="50" y2="5" /> <polygon points="50,5 45,2 46,8" fill="#ef4444"/>
+                            </g>
+                        </g>
+                        <polyline points="800,240 800,270 705,270" class="wire"/>
+                        <text x="845" y="210" font-size="14" font-weight="bold" fill="#0f172a">LED</text>
+                        <text x="845" y="225" font-size="12" fill="#475569">(LOAD)</text>
+
+                        <!-- Transistor Q1 -->
+                        <g id="q1-transistor" transform="translate(670, 280)">
+                            <circle cx="20" cy="20" r="35" fill="#e0f2fe" stroke="#0f172a" stroke-width="2.5"/>
+                            <line x1="-30" y1="20" x2="5" y2="20" stroke="#0f172a" stroke-width="4"/>
+                            <line x1="5" y1="0" x2="5" y2="40" stroke="#0f172a" stroke-width="5"/>
+                            <line x1="5" y1="10" x2="30" y2="-10" stroke="#0f172a" stroke-width="4"/>
+                            <line x1="30" y1="-10" x2="35" y2="-10" stroke="#0f172a" stroke-width="4"/> 
+                            <line x1="5" y1="30" x2="30" y2="50" stroke="#0f172a" stroke-width="4"/>
+                            <line x1="30" y1="50" x2="35" y2="50" stroke="#0f172a" stroke-width="4"/> 
+                            <polygon points="30,50 18,45 26,35" fill="#0f172a"/>
+                            <text x="-15" y="10" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0f172a">B</text>
+                            <text x="35" y="-20" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0f172a">C</text>
+                            <text x="35" y="70" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0f172a">E</text>
+                        </g>
+                        <text x="730" y="295" font-size="16" font-weight="bold" fill="#0f172a">Q1</text>
+                        <text x="730" y="315" font-size="14" fill="#475569">2N2222</text>
+                        <line x1="705" y1="330" x2="705" y2="480" class="wire"/>
+                        <circle cx="705" cy="480" r="5" fill="#0f172a"/>
+
+                        <!-- Voltage Measurement Terminals -->
+                        <!-- VBE -->
+                        <line x1="630" y1="300" x2="630" y2="390" class="wire"/>
+                        <circle cx="630" cy="300" r="5" fill="#0f172a"/>
+                        <use href="#socket-red" x="630" y="390"/>
+                        <text x="610" y="380" font-size="18" font-weight="bold" fill="#dc2626">+</text>
+                        <line x1="630" y1="440" x2="630" y2="480" class="wire"/>
+                        <circle cx="630" cy="480" r="5" fill="#0f172a"/>
+                        <use href="#socket-black" x="630" y="440"/>
+                        <text x="610" y="450" font-size="18" font-weight="bold" fill="#0f172a">-</text>
+                        <text x="580" y="420" text-anchor="middle" font-size="20" font-weight="bold" fill="#1d4ed8">V<tspan baseline-shift="sub" font-size="14">BE</tspan></text>
+
+                        <!-- VCE -->
+                        <line x1="800" y1="270" x2="880" y2="270" class="wire"/>
+                        <circle cx="800" cy="270" r="5" fill="#0f172a"/>
+                        <use href="#socket-red" x="880" y="270"/>
+                        <text x="900" y="275" font-size="18" font-weight="bold" fill="#dc2626">+</text>
+                        <line x1="880" y1="380" x2="880" y2="480" class="wire"/>
+                        <circle cx="880" cy="480" r="5" fill="#0f172a"/>
+                        <use href="#socket-black" x="880" y="380"/>
+                        <text x="900" y="385" font-size="18" font-weight="bold" fill="#0f172a">-</text>
+                        <text x="910" y="335" text-anchor="middle" font-size="24" font-weight="bold" fill="#1d4ed8">V<tspan baseline-shift="sub" font-size="16">CE</tspan></text>
+
+                        <!-- Particle Groups -->
+                        <g id="currentFlowGroupOn" class="hidden pointer-events-none">
+                            <circle class="electron flow-path-b" cx="0" cy="0"/>
+                            <circle class="electron flow-path-b" cx="0" cy="0" style="animation-delay: -1s;" />
+                            <circle class="electron flow-path-b" cx="0" cy="0" style="animation-delay: -2s;" />
+                            <circle class="electron flow-path-c" cx="0" cy="0"/>
+                            <circle class="electron flow-path-c" cx="0" cy="0" style="animation-delay: -0.5s;" />
+                            <circle class="electron flow-path-c" cx="0" cy="0" style="animation-delay: -1s;" />
+                            <circle class="electron flow-path-c" cx="0" cy="0" style="animation-delay: -1.5s;" />
+                            <circle class="electron flow-path-c" cx="0" cy="0" style="animation-delay: -2s;" />
+                            <circle class="electron flow-path-c" cx="0" cy="0" style="animation-delay: -2.5s;" />
+                        </g>
+
+                        <g id="currentFlowGroupPulse" class="hidden pointer-events-none">
+                            <circle class="electron-pulse flow-path-b-pulse" cx="0" cy="0"/>
+                            <circle class="electron-pulse flow-path-b-pulse" cx="0" cy="0" style="animation-delay: -0.8s;" />
+                            <circle class="electron-pulse flow-path-b-pulse" cx="0" cy="0" style="animation-delay: -1.6s;" />
+                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0"/>
+                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0" style="animation-delay: -0.5s;" />
+                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0" style="animation-delay: -1s;" />
+                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0" style="animation-delay: -1.5s;" />
+                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0" style="animation-delay: -2s;" />
+                            <circle class="electron-pulse-c flow-path-c" cx="0" cy="0" style="animation-delay: -2.5s;" />
+                        </g>
+
+                        <!-- Hotspots -->
+                        <g id="hotspots">
+                            <rect x="220" y="180" width="165" height="205" class="hotspot" onclick="showInfo('inputSelect')" rx="8"/>
+                            <rect x="540" y="270" width="70" height="60" class="hotspot" onclick="showInfo('rb')"/>
+                            <circle cx="690" cy="300" r="45" class="hotspot" onclick="showInfo('q1')"/>
+                            <rect x="770" y="90" width="60" height="80" class="hotspot" onclick="showInfo('rled')"/>
+                            <rect x="770" y="180" width="60" height="70" class="hotspot" onclick="showInfo('led')"/>
+                            <rect x="400" y="250" width="140" height="80" class="hotspot" onclick="showInfo('ib')"/>
+                            <rect x="580" y="40" width="160" height="70" class="hotspot" onclick="showInfo('ic')"/>
+                            <rect x="580" y="360" width="80" height="110" class="hotspot" onclick="showInfo('vbe')"/>
+                            <rect x="850" y="240" width="80" height="170" class="hotspot" onclick="showInfo('vce')"/>
+                        </g>
+                        
+                        <!-- Probes Drop Animation -->
+                        <g id="active-probes" class="hidden pointer-events-none">
+                            <use href="#probe-red" id="probe-red-instance" class="probe-drop" x="0" y="0" />
+                            <use href="#probe-black" id="probe-black-instance" class="probe-drop" x="0" y="0" />
+                        </g>
+
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= LEFT/BOTTOM PANEL: CONTROLS & MEASUREMENTS ================= -->
+        <aside class="order-2 lg:order-1 w-full lg:w-[380px] xl:w-[410px] bg-slate-900/95 border-t lg:border-t-0 lg:border-r border-slate-800 flex flex-col shrink-0 custom-scrollbar z-20 shadow-2xl">
+            
+            <!-- Sticky Tabs -->
+            <div class="grid grid-cols-2 p-2 bg-slate-950/60 border-b border-slate-800 gap-1.5 shrink-0">
+                <button onclick="switchTab('learn')" id="tab-learn" class="flex items-center justify-center py-2.5 px-2 rounded-lg font-semibold text-xs transition duration-200 bg-cyan-600 text-white shadow-md shadow-cyan-600/30">
+                    <i class="fas fa-microchip mr-1.5 sm:mr-2"></i>1. เรียนรู้ & จำลองสภาวะ
+                </button>
+                <button onclick="switchTab('measure')" id="tab-measure" class="flex items-center justify-center py-2.5 px-2 rounded-lg font-semibold text-xs transition duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
+                    <i class="fas fa-gauge mr-1.5 sm:mr-2"></i>2. ทดลองวัด & บันทึกผล
+                </button>
+            </div>
+
+            <!-- Tab Content: Learn -->
+            <div id="content-learn" class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+                
+                <div class="bg-gradient-to-br from-cyan-950/40 via-slate-800/40 to-slate-900 border border-cyan-500/30 rounded-xl p-3.5 shadow-sm">
+                    <div class="flex items-center space-x-2 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-2">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>ขั้นตอนการเรียนรู้ด้วยชุดสาธิต</span>
+                    </div>
+                    <ul class="text-xs text-slate-300 space-y-1.5 leading-relaxed">
+                        <li class="flex items-start"><span class="text-cyan-400 font-bold mr-1.5">•</span> <span>คลิกที่ <strong>กรอบไฮไลท์สีฟ้า</strong> บนแผงวงจรเพื่อศึกษาข้อมูลอุปกรณ์</span></li>
+                        <li class="flex items-start"><span class="text-cyan-400 font-bold mr-1.5">•</span> <span>เปลี่ยนสวิตช์ <strong>INPUT SELECT</strong> ด้านล่างเพื่อสังเกตการตัด-ต่อกระแส</span></li>
+                        <li class="flex items-start"><span class="text-cyan-400 font-bold mr-1.5">•</span> <span>สังเกต <strong>กระแส Base (IB)</strong> และ <strong>กระแส Collector (IC)</strong> เมื่อ LED สว่าง</span></li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-850 border border-slate-750/80 rounded-xl p-4 shadow-md">
+                    <div class="flex items-center justify-between border-b border-slate-700/60 pb-2 mb-3">
+                        <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wide flex items-center">
+                            <i class="fas fa-sliders text-cyan-400 mr-2"></i> ควบคุมสถานะอินพุต (INPUT SELECT)
+                        </h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-2">
+                        <label class="relative flex items-center p-3 rounded-lg border border-slate-700 bg-slate-800/40 hover:bg-slate-800 cursor-pointer transition">
+                            <input type="radio" name="inputMode" value="off" class="sr-only" checked onchange="changeMode('off')">
+                            <div class="mode-radio-dot w-4 h-4 rounded-full border-2 border-red-400 mr-3 flex items-center justify-center">
+                                <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-semibold text-white">OFF (0V / GND)</span>
+                                    <span class="text-[11px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-mono">Cut-off</span>
+                                </div>
+                                <p class="text-xs text-slate-400">IB ≈ 0, Q1 สวิตช์เปิด (Open), LED ดับ</p>
+                            </div>
+                        </label>
+
+                        <label class="relative flex items-center p-3 rounded-lg border border-slate-700 bg-slate-800/40 hover:bg-slate-800 cursor-pointer transition">
+                            <input type="radio" name="inputMode" value="on" class="sr-only" onchange="changeMode('on')">
+                            <div class="mode-radio-dot w-4 h-4 rounded-full border-2 border-slate-500 mr-3 flex items-center justify-center">
+                                <div class="w-2 h-2 rounded-full bg-transparent"></div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-semibold text-white">ON (5V)</span>
+                                    <span class="text-[11px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono">Saturation</span>
+                                </div>
+                                <p class="text-xs text-slate-400">IB ไหลเพียงพอ, Q1 สวิตช์ปิด (Close), LED สว่าง</p>
+                            </div>
+                        </label>
+
+                        <label class="relative flex items-center p-3 rounded-lg border border-slate-700 bg-slate-800/40 hover:bg-slate-800 cursor-pointer transition">
+                            <input type="radio" name="inputMode" value="pulse" class="sr-only" onchange="changeMode('pulse')">
+                            <div class="mode-radio-dot w-4 h-4 rounded-full border-2 border-slate-500 mr-3 flex items-center justify-center">
+                                <div class="w-2 h-2 rounded-full bg-transparent"></div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-semibold text-white">PULSE (0-5V DC)</span>
+                                    <span class="text-[11px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 font-mono">Switching</span>
+                                </div>
+                                <p class="text-xs text-slate-400">สัญญาณพัลส์จาก Function Generator สลับ ON/OFF</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div id="pulseControls" class="mt-3 pt-3 border-t border-slate-750 hidden space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-medium text-slate-300">ความถี่สัญญาณ (Frequency):</span>
+                            <div class="flex items-center space-x-1">
+                                <input type="number" id="freqInputText" min="0.1" max="10" step="0.1" value="1" 
+                                    class="w-16 bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5 text-xs text-cyan-400 font-mono text-center font-bold outline-none focus:border-cyan-500" 
+                                    oninput="syncFrequency(this.value)">
+                                <span class="text-xs text-slate-400 font-mono">Hz</span>
+                            </div>
+                        </div>
+                        <input type="range" id="freqSlider" min="0.1" max="10" step="0.1" value="1" 
+                            class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400" 
+                            oninput="syncFrequency(this.value)">
+                        
+                        <div class="flex gap-2">
+                            <button id="pauseGraphBtn" onclick="togglePulsePause()" class="flex-1 py-1.5 px-3 bg-amber-600/80 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow transition flex items-center justify-center gap-1">
+                                <i class="fas fa-pause text-xs"></i> <span>หยุดชั่วคราว</span>
+                            </button>
+                            <button onclick="openGraphModal()" class="flex-1 py-1.5 px-3 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center justify-center gap-1">
+                                <i class="fas fa-chart-line text-xs"></i> <span>เปิด Oscilloscope</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-850 border border-slate-750/80 rounded-xl p-4 shadow-md">
+                    <div class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+                        <span>สถานะวงจรปัจจุบัน (Telemetry)</span>
+                        <span id="q1ActiveBadge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-red-500/20 text-red-400 font-bold">Cut-off</span>
+                    </div>
+
+                    <div id="statusMessage" class="text-center font-bold text-sm text-red-400 bg-red-950/40 border border-red-500/30 p-2.5 rounded-lg mb-2.5">
+                        วงจรอยู่ในสภาวะ CUT-OFF (OFF)
+                    </div>
+                    <p id="statusDescription" class="text-xs text-slate-300 text-center leading-relaxed mb-3">
+                        ไม่มีกระแส Base → Transistor ไม่นำกระแส → LED ดับ
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-center">
+                            <span class="block text-slate-400 text-[11px] mb-0.5">Transistor Q1</span>
+                            <span id="q1Status" class="font-bold font-mono text-red-400">Cut-off (Open)</span>
+                        </div>
+                        <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-center">
+                            <span class="block text-slate-400 text-[11px] mb-0.5">LED Load</span>
+                            <span id="ledStatus" class="font-bold font-mono text-red-400">OFF (ดับ)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post-Lesson Quiz Button -->
+                <button onclick="openQuizForm()" class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition flex items-center justify-center gap-2 text-sm tracking-wide">
+                    <i class="fas fa-file-signature text-lg"></i>
+                    <span>ทำแบบทดสอบประเมินความรู้</span>
+                </button>
+
+                <!-- Quick Quiz Section -->
+                <div id="quizContainer" class="border border-indigo-500/30 bg-indigo-950/30 rounded-xl p-3.5 hidden flex-col shadow-inner">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center space-x-1.5 text-indigo-300 font-bold text-xs">
+                            <i class="fas fa-question-circle"></i>
+                            <span>ทบทวนความเข้าใจ</span>
+                            <span id="quizBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono">ข้อ 1/3</span>
+                        </div>
+                        <button id="quizDismissBtn" onclick="dismissQuiz()" class="hidden items-center text-[11px] text-red-300 hover:text-red-100 bg-red-900/40 border border-red-600/40 px-2 py-0.5 rounded transition">
+                            <i class="fas fa-trash-alt mr-1"></i> ลบทิ้ง
+                        </button>
+                    </div>
+                    <p id="quizQuestion" class="text-xs text-slate-200 mb-2.5 leading-relaxed">คำถามโหลด...</p>
+                    <div class="grid grid-cols-1 gap-1.5">
+                        <button onclick="answerQuiz(0)" id="quizBtn0" class="text-left px-3 py-2 text-xs bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-200 transition">ตัวเลือก A</button>
+                        <button onclick="answerQuiz(1)" id="quizBtn1" class="text-left px-3 py-2 text-xs bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-200 transition">ตัวเลือก B</button>
+                    </div>
+                    <div id="quizFeedback" class="mt-2 text-xs font-medium hidden p-2 rounded-lg leading-relaxed"></div>
+                    <button id="quizNextBtn" onclick="nextQuizQuestion()" class="hidden items-center justify-center gap-1.5 mt-2.5 w-full py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition shadow">
+                        <span>ข้อถัดไป</span> <i class="fas fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Content: Measure & Record -->
+            <div id="content-measure" class="flex-1 overflow-y-auto hidden custom-scrollbar p-4 space-y-4">
+                
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-xs text-amber-200">
+                    <div class="font-bold flex items-center gap-1.5 mb-1 text-amber-400">
+                        <i class="fas fa-bolt"></i> ข้อปฏิบัติการวัดค่าทางไฟฟ้า
+                    </div>
+                    <ul class="list-disc pl-4 space-y-0.5 text-slate-300">
+                        <li><strong>วัดกระแส (A):</strong> ต่อแบบ <strong>อนุกรม</strong> (ระบบจำลองการปลด Jumper)</li>
+                        <li><strong>วัดแรงดัน (V):</strong> ต่อแบบ <strong>ขนาน</strong> คร่อมจุดที่ต้องการวัด</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gradient-to-b from-slate-800 via-slate-850 to-slate-900 border-2 border-slate-700 rounded-2xl p-4 shadow-xl relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-2.5 border-b border-slate-700/60 pb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                            <span class="text-xs font-bold tracking-wider text-slate-200 uppercase font-mono">DIGITAL MULTIMETER</span>
+                        </div>
+                        <div class="flex space-x-1">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                            <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                        </div>
+                    </div>
+
+                    <div class="lcd-display rounded-xl p-3 mb-4">
+                        <div class="flex justify-between text-[11px] text-emerald-400/70 font-mono mb-1">
+                            <span id="lcdModeIndicator">DC VOLT</span>
+                            <span id="lcdHoldIndicator">AUTO RANGE</span>
+                        </div>
+                        <div class="flex items-baseline justify-end space-x-2">
+                            <span id="meterDisplay" class="text-4xl font-bold tracking-tight">0.00</span>
+                            <span id="meterUnit" class="text-xl font-bold">V</span>
+                        </div>
+                        <div class="mt-1 h-1.5 bg-emerald-950/60 rounded-full overflow-hidden">
+                            <div id="meterBar" class="h-full bg-emerald-400 w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <button onclick="setMeterMode('voltage')" id="btnModeV" class="py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-cyan-600 text-white shadow">
+                            <i class="fas fa-bolt mr-1"></i> DC Voltage (V)
+                        </button>
+                        <button onclick="setMeterMode('current')" id="btnModeA" class="py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-slate-800 text-slate-300 hover:bg-slate-750">
+                            <i class="fas fa-wave-square mr-1"></i> DC Current (mA)
+                        </button>
+                    </div>
+
+                    <div class="space-y-1.5 mb-4">
+                        <label class="block text-xs font-bold text-slate-300">เลือกตำแหน่งทดสอบ (Test Point):</label>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button onclick="selectTarget('VBE')" id="btnTarget-VBE" class="py-2 px-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-750 text-slate-200 transition">VBE</button>
+                            <button onclick="selectTarget('VCE')" id="btnTarget-VCE" class="py-2 px-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-750 text-slate-200 transition">VCE</button>
+                            <button onclick="selectTarget('IB')" id="btnTarget-IB" class="py-2 px-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-750 text-slate-200 transition">IB</button>
+                            <button onclick="selectTarget('IC')" id="btnTarget-IC" class="py-2 px-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-750 text-slate-200 transition">IC</button>
+                        </div>
+                    </div>
+
+                    <button onclick="performMeasurement()" class="w-full py-2.5 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs uppercase tracking-wider">
+                        <i class="fas fa-crosshairs text-sm"></i> <span>นำหัวโพรบไปจิ้มวัดค่า</span>
+                    </button>
+                    <div id="measureFeedback" class="hidden mt-3 rounded-xl p-3.5 border text-xs leading-relaxed transition-all"></div>
+                </div>
+
+                <div class="bg-slate-850 border border-slate-750 rounded-xl p-4 shadow-md space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-750 pb-2">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-clipboard-check text-cyan-400 text-sm"></i>
+                            <h3 class="text-xs font-bold text-white uppercase">ตารางบันทึกผล</h3>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-lg border border-slate-750 bg-slate-900/80">
+                        <table class="min-w-full text-xs text-center">
+                            <thead class="bg-slate-800/80 text-slate-300 font-semibold border-b border-slate-700">
+                                <tr>
+                                    <th class="py-2 px-1 text-[11px]">สภาวะ</th>
+                                    <th class="py-2 px-1 text-[11px]">IB(mA)</th>
+                                    <th class="py-2 px-1 text-[11px]">IC(mA)</th>
+                                    <th class="py-2 px-1 text-[11px]">VBE(V)</th>
+                                    <th class="py-2 px-1 text-[11px]">VCE(V)</th>
+                                    <th class="py-2 px-1 text-[11px]">LED</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recordTableBody" class="divide-y divide-slate-800 text-slate-200">
+                                <tr>
+                                    <td class="py-2 px-1 font-semibold text-slate-300 text-[11px]">OFF</td>
+                                    <td class="py-2 px-1"><input type="text" id="rec-off-ib" class="w-10 sm:w-12 text-center bg-slate-800 border border-slate-700 rounded p-1 text-[11px] font-mono text-cyan-300" placeholder="..."></td>
+                                    <td class="py-2 px-1"><input type="text" id="rec-off-ic" class="w-10 sm:w-12 text-center bg-slate-800 border border-slate-700 rounded p-1 text-[11px] font-mono text-cyan-300" placeholder="..."></td>
+                                    <td class="py-2 px-1"><input type="text" id="rec-off-vbe" class="w-10 sm:w-12 text-center bg-slate-800 border border-slate-700 rounded p-1 text-[11px] font-mono text-cyan-300" placeholder="..."></td>
+                                    <td class="py-2 px-1"><input type="text" id="rec-off-vce" class="w-10 sm:w-12 text-center bg-slate-800 border border-slate-700 rounded p-1 text-[11px] font-mono text-cyan-300" placeholder="..."></td>
+                                    <td class="py-2 px-1">
+                                        <select id="rec-off-led" class="bg-slate-800 border border-slate-700 rounded p-1 text-[11px] text-slate-200 outline-none w-14">
+                                            <option value="">-</option><option value="ดับ">ดับ</option><option value="สว่าง">สว่าง</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-1 font-semibold text-slate-300 text-[11px]">ON</td>
+                                    <td class="py-2 px-1"><input type="text" id="rec-on-ib" class="w-10 sm:w-12 text-center bg-slate-800 border border-slate-700 rounded p-1 text-[11px] font-mono text-cyan-300" placeholder="..."></td>
+                                    <td class="py-2 px-1"><input type="text" id="rec-on-ic" class="w-10 sm:w-12 text-center bg-slate-800 border border-slate-700 rounded p-1 text-[11px] font-mono text-cyan-300" placeholder="..."></td>
+                                    <td class="py-2 px-1"><input type="text" id="rec-on-vbe" class="w-10 sm:w-12 text-center bg-slate-800 border border-slate-700 rounded p-1 text-[11px] font-mono text-cyan-300" placeholder="..."></td>
+                                    <td class="py-2 px-1"><input type="text" id="rec-on-vce" class="w-10 sm:w-12 text-center bg-slate-800 border border-slate-700 rounded p-1 text-[11px] font-mono text-cyan-300" placeholder="..."></td>
+                                    <td class="py-2 px-1">
+                                        <select id="rec-on-led" class="bg-slate-800 border border-slate-700 rounded p-1 text-[11px] text-slate-200 outline-none w-14">
+                                            <option value="">-</option><option value="ดับ">ดับ</option><option value="สว่าง">สว่าง</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <button onclick="checkRecords()" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition text-xs flex items-center justify-center gap-2">
+                        <i class="fas fa-check-double"></i> <span>ตรวจคำตอบการทดลอง</span>
+                    </button>
+
+                    <div id="recordFeedback" class="hidden p-3 rounded-xl text-xs leading-relaxed"></div>
+
+                    <!-- Theoretical Comparison Table -->
+                    <div id="compareTableContainer" class="hidden pt-2 border-t border-slate-750">
+                        <div class="flex items-center space-x-1.5 mb-2 text-emerald-400 font-bold text-xs">
+                            <i class="fas fa-award"></i>
+                            <h4>เฉลยตารางเปรียบเทียบค่าทางทฤษฎี</h4>
+                        </div>
+                        <div class="overflow-hidden rounded-lg border border-slate-700 bg-slate-900">
+                            <table class="min-w-full text-xs text-center">
+                                <thead class="bg-slate-800 text-slate-300">
+                                    <tr>
+                                        <th class="py-1.5 px-2 border-r border-slate-700 text-[11px]">พารามิเตอร์</th>
+                                        <th class="py-1.5 px-2 border-r border-slate-700 text-[11px]">Cut-off</th>
+                                        <th class="py-1.5 px-2 text-[11px]">Saturation</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800 font-mono text-[11px]">
+                                    <tr><td class="py-1 px-2 border-r border-slate-800 text-slate-400 font-sans">IB</td><td class="py-1 px-2 border-r border-slate-800 text-slate-500">≈ 0 mA</td><td class="py-1 px-2 text-emerald-400 font-bold">≈ 0.9 mA</td></tr>
+                                    <tr><td class="py-1 px-2 border-r border-slate-800 text-slate-400 font-sans">IC</td><td class="py-1 px-2 border-r border-slate-800 text-slate-500">≈ 0 mA</td><td class="py-1 px-2 text-emerald-400 font-bold">≈ 8-10 mA</td></tr>
+                                    <tr><td class="py-1 px-2 border-r border-slate-800 text-slate-400 font-sans">VBE</td><td class="py-1 px-2 border-r border-slate-800">≈ 0 V</td><td class="py-1 px-2 text-amber-400">≈ 0.6-0.8 V</td></tr>
+                                    <tr><td class="py-1 px-2 border-r border-slate-800 text-slate-400 font-sans">VCE</td><td class="py-1 px-2 border-r border-slate-800 text-cyan-400 font-bold">≈ 5.0 V</td><td class="py-1 px-2 text-emerald-400 font-bold">≈ 0.1-0.3 V</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+    </main>
+
+    <!-- DSO Modal -->
+    <div id="graphModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden items-center justify-center p-3 md:p-6 transition-opacity">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col ring-1 ring-white/10">
+            <div class="bg-slate-850 px-5 py-3 flex justify-between items-center border-b border-slate-750">
+                <div class="flex items-center space-x-3">
+                    <div class="w-3 h-3 rounded-full bg-purple-500 animate-pulse"></div>
+                    <h3 class="font-bold text-sm md:text-base text-white font-mono flex items-center gap-2">
+                        <i class="fas fa-wave-square text-purple-400"></i> DIGITAL STORAGE OSCILLOSCOPE (DSO-2000)
+                    </h3>
+                </div>
+                <button onclick="closeGraphModal()" class="text-slate-400 hover:text-white transition p-1.5 rounded-lg hover:bg-slate-800">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="p-4 bg-slate-950 flex-1">
+                <div class="dso-screen w-full h-[250px] md:h-[320px] rounded-xl border border-cyan-500/30 p-2 relative overflow-hidden flex flex-col justify-between">
+                    <div class="flex justify-between items-center px-2 pt-1 text-[11px] font-mono text-cyan-400/80 z-10">
+                        <span>CH1: 2.00V/DIV</span>
+                        <span id="dsoTriggerState" class="text-emerald-400 font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40">TRIGGER: AUTO</span>
+                        <span id="dsoFreqReadout">FREQ: 1.00 Hz</span>
+                    </div>
+                    <canvas id="pulseGraphModal" class="w-full h-full"></canvas>
+                </div>
+            </div>
+            <div class="bg-slate-850 px-5 py-3.5 flex flex-col sm:flex-row justify-between items-center border-t border-slate-750 gap-3">
+                <div class="flex items-center space-x-3 w-full sm:w-auto">
+                    <button id="modalPauseBtn" onclick="togglePulsePause()" class="flex-1 sm:flex-none px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow transition text-xs flex items-center justify-center gap-2">
+                        <i class="fas fa-pause"></i> <span>STOP</span>
+                    </button>
+                    <div class="flex items-center space-x-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
+                        <span class="text-xs text-slate-300 font-medium">Freq:</span>
+                        <input type="range" id="modalFreqSlider" min="0.1" max="10" step="0.1" value="1" class="w-24 md:w-36 accent-purple-400 cursor-pointer" oninput="syncFrequency(this.value)">
+                        <span id="modalFreqValue" class="text-xs font-mono font-bold text-purple-400 w-12 text-right">1.0 Hz</span>
+                    </div>
+                </div>
+                <button onclick="closeGraphModal()" class="w-full sm:w-auto px-5 py-2 bg-slate-750 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl transition border border-slate-650">
+                    ปิดหน้าต่าง DSO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-750 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform scale-95 opacity-0 transition-all duration-300 ring-1 ring-white/10" id="infoModalContent">
+            <div class="bg-gradient-to-r from-blue-700 to-cyan-600 px-5 py-3.5 flex justify-between items-center text-white">
+                <h3 class="font-bold text-sm md:text-base flex items-center gap-2" id="modalTitle">
+                    <i class="fas fa-circle-info"></i> <span>ชื่ออุปกรณ์</span>
+                </h3>
+                <button onclick="closeInfo()" class="text-white/80 hover:text-white focus:outline-none"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            <div class="p-5 max-h-[72vh] overflow-y-auto custom-scrollbar space-y-4 text-xs text-slate-300">
+                <div class="flex items-center justify-center p-4 bg-slate-950 rounded-xl border border-slate-800">
+                    <svg id="modalSymbol" width="100" height="100" viewBox="-10 -10 120 120"></svg>
+                </div>
+                <div><h4 class="font-bold text-cyan-400 border-b border-slate-800 pb-1.5 mb-2">หน้าที่และหลักการทำงาน</h4><p id="modalFunction"></p></div>
+                <div><h4 class="font-bold text-cyan-400 border-b border-slate-800 pb-1.5 mb-2">ข้อมูลที่เกี่ยวข้องในวงจร</h4><ul id="modalData" class="list-disc pl-5 space-y-1"></ul></div>
+                <div id="modalWarningBox" class="hidden bg-amber-500/10 border-l-4 border-amber-500 p-3 text-amber-200">
+                    <strong class="text-amber-400"><i class="fas fa-triangle-exclamation mr-1"></i> ข้อควรระวัง: </strong><span id="modalWarningText"></span>
+                </div>
+            </div>
+            <div class="bg-slate-850 px-5 py-3 text-right border-t border-slate-800">
+                <button onclick="closeInfo()" class="bg-cyan-600 text-slate-950 font-bold py-2 px-5 rounded-xl shadow text-xs">เข้าใจแล้ว</button>
+            </div>
+        </div> 
+    </div> <!-- CORRECTED: Closing tag for infoModal -->
+
+    <!-- Registration Google Form Pop-up Modal -->
+    <div id="googleFormModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100] hidden items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col h-[85vh] sm:h-[80vh] relative ring-4 ring-cyan-500/30">
+            <div class="bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-3.5 flex justify-between items-center text-white shrink-0 shadow-md z-20">
+                <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
+                    <i class="fas fa-clipboard-user text-lg"></i> 
+                    <span>ลงทะเบียนเข้าใช้งานชุดสาธิต</span>
+                </h3>
+                <button onclick="closeGoogleForm()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition focus:outline-none flex items-center justify-center">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="flex-1 w-full bg-slate-50 relative">
+                <div id="formLoading" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 z-0 bg-slate-50">
+                    <i class="fas fa-circle-notch fa-spin text-5xl mb-4 text-cyan-600"></i>
+                    <p class="text-sm font-bold text-slate-600">กำลังโหลดแบบฟอร์ม...</p>
+                </div>
+                <iframe 
+                    id="registerIframe"
+                    src="https://docs.google.com/forms/d/e/1FAIpQLSen7kzsSleWJT4SD13zskMktYY9rSHMo3cW-o5eCO2shPD5cA/viewform?embedded=true" 
+                    width="100%" 
+                    height="100%" 
+                    frameborder="0" 
+                    marginheight="0" 
+                    marginwidth="0"
+                    class="relative z-10"
+                    onload="handleFormLoad()">
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Google Form Pop-up Modal -->
+    <div id="quizFormModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100] hidden items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col h-[85vh] sm:h-[80vh] relative ring-4 ring-indigo-500/30">
+            <div class="bg-gradient-to-r from-indigo-700 to-purple-600 px-5 py-3.5 flex justify-between items-center text-white shrink-0 shadow-md z-20">
+                <h3 class="font-bold text-sm md:text-base flex items-center gap-2">
+                    <i class="fas fa-clipboard-list text-lg"></i> 
+                    <span>แบบทดสอบประเมินความรู้</span>
+                </h3>
+                <button onclick="closeQuizForm()" class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition focus:outline-none flex items-center justify-center">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="flex-1 w-full bg-slate-50 relative">
+                <div id="quizFormLoading" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 z-0 bg-slate-50">
+                    <i class="fas fa-circle-notch fa-spin text-5xl mb-4 text-indigo-600"></i>
+                    <p class="text-sm font-bold text-slate-600">กำลังโหลดแบบทดสอบ...</p>
+                </div>
+                <iframe 
+                    id="quizIframe"
+                    src="https://docs.google.com/forms/d/e/1FAIpQLSfFbGOdD5TpuWdYWvfdS7X6dsEPGVMrBXkyH1sHP79VLqlN5Q/viewform?embedded=true" 
+                    width="100%" 
+                    height="100%" 
+                    frameborder="0" 
+                    marginheight="0" 
+                    marginwidth="0"
+                    class="relative z-10"
+                    onload="handleQuizFormLoad()">
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Alert Toast / Message Box -->
+    <div id="msgBox" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-750 rounded-2xl shadow-2xl max-w-sm w-full p-5 text-center ring-1 ring-white/10">
+            <div id="msgIcon" class="text-4xl mb-3"></div>
+            <h3 id="msgTitle" class="text-base font-bold text-white mb-2"></h3>
+            <p id="msgText" class="text-slate-300 text-xs mb-5 leading-relaxed"></p>
+            <button onclick="closeMsgBox()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 py-2 rounded-xl font-bold text-xs transition">
+                รับทราบ
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'off'; 
+        let currentTab = 'learn';
+        let pulseInterval;
+        let pulseState = false; 
+        let pulseFrequency = 1; 
+        let isPulsePaused = false;
+        let chartInstance = null;
+        let chartTime = 0;
+        let measurementMode = 'voltage'; 
+        let currentSelectedTarget = '';
+        let isProbesConnected = false;
+
+        // Quiz Questions Data (3 Questions)
+        let currentQuizIndex = 0;
+        const quizList = [
+            {
+                q: "เมื่อกระแส Base (IB) มีค่าใกล้ 0 mA ทรานซิสเตอร์ Q1 อยู่ในสภาวะใด?",
+                options: [
+                    "A. Saturation (อิ่มตัว)",
+                    "B. Cut-off (ตัดวงจร)"
+                ],
+                correct: 1,
+                feedbackCorrect: "ถูกต้อง! เมื่อไม่มีกระแส Base (IB ≈ 0) ทรานซิสเตอร์จะไม่นำกระแส เรียกว่าสภาวะ Cut-off หรือเสมือนสวิตช์เปิดวงจร",
+                feedbackWrong: "ยังไม่ถูกต้อง: หากไม่มีกระแสมากระตุ้นที่ขา Base ทรานซิสเตอร์จะไม่ยอมให้กระแสผ่าน จะอยู่ในสภาวะตัดวงจร (Cut-off)"
+            },
+            {
+                q: "เมื่อป้อนแรงดัน Vin = 5V จน Q1 อิ่มตัว (Saturation) แรงดัน VCE จะมีค่าประมาณเท่าใด?",
+                options: [
+                    "A. มีค่าต่ำมากประมาณ 0.1 - 0.3 V",
+                    "B. มีค่าสูงเท่ากับแหล่งจ่ายประมาณ 5.0 V"
+                ],
+                correct: 0,
+                feedbackCorrect: "ถูกต้อง! ในสภาวะ Saturation ขา C และ E เสมือนลัดวงจรถึงกัน (สวิตช์ปิด) แรงดันตกคร่อม VCE จึงลดลงต่ำมากเหลือเพียง 0.1 - 0.3 V",
+                feedbackWrong: "ยังไม่ถูกต้อง: ในสภาวะอิ่มตัว (Saturation) ทรานซิสเตอร์เปรียบเสมือนสวิตช์ปิดวงจร แรงดันตกคร่อม VCE จะต่ำมาก (< 0.5 V)"
+            },
+            {
+                q: "หากต้องการวัดกระแสโหลดหลัก (IC) ต้องต่อเครื่องวัดอย่างไร?",
+                options: [
+                    "A. ต่อโวลต์มิเตอร์แบบขนานคร่อมจุด C และ E",
+                    "B. ถอดสายจั๊มเปอร์แล้วต่อแอมมิเตอร์แบบอนุกรม"
+                ],
+                correct: 1,
+                feedbackCorrect: "ถูกต้อง! การวัดกระแส (IC) จะต้องปลดสายจั๊มเปอร์ออก แล้วนำแอมมิเตอร์มาต่อแบบอนุกรมในเส้นทางไหลของกระแส Collector",
+                feedbackWrong: "ยังไม่ถูกต้อง: การวัดกระแสไฟฟ้าต้องแทรกแอมมิเตอร์เข้าไปในวงจรแบบอนุกรม โดยต้องปลดสายจั๊มเปอร์ออกก่อน"
+            }
+        ];
+
+        const idealValues = {
+            off: { ib: 0.0, ic: 0.0, vbe: 0.0, vce: 5.0 },
+            on: { ib: 0.93, ic: 9.1, vbe: 0.72, vce: 0.15 }
+        };
+        
+        const probeCoords = {
+            'IB':  { rx: 420, ry: 300, bx: 520, by: 300 },
+            'IC':  { rx: 600, ry: 80,  bx: 720, by: 80 },
+            'VBE': { rx: 630, ry: 390, bx: 630, by: 440 },
+            'VCE': { rx: 880, ry: 270, bx: 880, by: 380 }
+        };
+
+        const componentInfo = {
+            inputSelect: {
+                title: "INPUT SELECT (สวิตช์เลือกสัญญาณอินพุต)",
+                symbol: `<rect x="10" y="10" width="80" height="80" fill="none" stroke="#2563eb" stroke-width="2"/><circle cx="50" cy="50" r="10" fill="#1f2937"/><line x1="50" y1="50" x2="20" y2="20" stroke="#9ca3af" stroke-width="5"/>`,
+                func: "ทำหน้าที่จำลองสัญญาณอินพุต (Vin) ที่จะส่งไปยังขา Base ของทรานซิสเตอร์ เพื่อควบคุมการเปิด-ปิดวงจร",
+                data: [
+                    "<b>ON (5V):</b> จ่ายแรงดัน 5V เข้าขา Base ทำให้ Q1 ทำงานในสภาวะ Saturation",
+                    "<b>OFF (0V):</b> จ่ายแรงดัน 0V (GND) เข้าขา Base ทำให้ Q1 อยู่ในสภาวะ Cut-off",
+                    "<b>PULSE:</b> รับสัญญาณรูปคลื่นสี่เหลี่ยม 0-5V จาก Function Generator เพื่อทดสอบการสวิตชิง"
+                ]
+            },
+            rb: {
+                title: "ตัวต้านทาน RB (Base Resistor)",
+                symbol: `<polyline points="10,50 20,30 30,70 40,30 50,70 60,30 70,70 80,50 90,50" fill="none" stroke="#1f2937" stroke-width="5" stroke-linejoin="round"/>`,
+                func: "จำกัดปริมาณกระแสไฟฟ้า (Base Current, IB) ที่จะไหลเข้าสู่ขา Base เพื่อป้องกันไม่ให้ทรานซิสเตอร์เสียหาย",
+                data: [
+                    "ค่าในวงจร: <b>4.7 kΩ</b>",
+                    "คำนวณ: <i>IB = (Vin - VBE) / RB</i>",
+                    "เมื่อ Vin = 5V จะได้ IB ≈ (5 - 0.7) / 4.7k ≈ 0.9 mA"
+                ]
+            },
+            q1: {
+                title: "ทรานซิสเตอร์ Q1 (NPN - 2N2222)",
+                symbol: `<circle cx="50" cy="50" r="40" fill="none" stroke="#1f2937" stroke-width="3"/><line x1="10" y1="50" x2="35" y2="50" stroke="#1f2937" stroke-width="3"/><line x1="35" y1="30" x2="35" y2="70" stroke="#1f2937" stroke-width="5"/><line x1="35" y1="40" x2="60" y2="15" stroke="#1f2937" stroke-width="3"/><line x1="60" y1="15" x2="60" y2="0" stroke="#1f2937" stroke-width="3"/><line x1="35" y1="60" x2="60" y2="85" stroke="#1f2937" stroke-width="3"/><line x1="60" y1="85" x2="60" y2="100" stroke="#1f2937" stroke-width="3"/><polygon points="60,85 50,75 57,68" fill="#1f2937"/>`,
+                func: "ทำหน้าที่เป็นสวิตช์อิเล็กทรอนิกส์ ควบคุมกระแสโหลด (IC) ด้วยกระแสควบคุมขนาดเล็ก (IB) ที่ขา Base",
+                data: [
+                    "<b>Cut-off:</b> IB = 0, IC = 0, VCE ≈ 5V (สวิตช์เปิด)",
+                    "<b>Saturation:</b> IB มีค่าพอ, IC ไหลสูงสุด, VCE ต่ำมาก ≈ 0.1-0.3V (สวิตช์ปิด)"
+                ]
+            },
+            rled: {
+                title: "ตัวต้านทาน R_LED (Load Resistor)",
+                symbol: `<polyline points="10,50 20,30 30,70 40,30 50,70 60,30 70,70 80,50 90,50" fill="none" stroke="#1f2937" stroke-width="5" stroke-linejoin="round"/>`,
+                func: "จำกัดกระแสไฟฟ้า (Collector Current, IC) ที่จะไหลผ่านหลอด LED เพื่อไม่ให้ LED เสียหาย",
+                data: ["ค่าในวงจร: <b>330 Ω</b>"]
+            },
+            led: {
+                title: "LED (Light Emitting Diode - โหลด)",
+                symbol: `<line x1="50" y1="10" x2="50" y2="50" stroke="#1f2937" stroke-width="3"/><polygon points="20,10 80,10 50,40" fill="none" stroke="#1f2937" stroke-width="3"/><line x1="20" y1="40" x2="80" y2="40" stroke="#1f2937" stroke-width="3"/>`,
+                func: "เป็นโหลด (Load) ของวงจรเพื่อแสดงผลการนำกระแสของทรานซิสเตอร์",
+                data: ["เมื่อ Q1 ทำงานในสภาวะ Saturation หลอด LED จะสว่าง"]
+            },
+            ib: {
+                title: "จุดวัดกระแส IB (Base Current)",
+                symbol: `<circle cx="50" cy="50" r="30" fill="none" stroke="#2563eb" stroke-width="4"/><text x="50" y="60" text-anchor="middle" font-size="24" font-weight="bold" fill="#2563eb">A</text>`,
+                func: "ตำแหน่งสำหรับแทรกแอมมิเตอร์เพื่อวัดกระแสที่ไหลเข้าขา Base",
+                data: ["Cut-off: IB ≈ 0 mA", "Saturation: IB ≈ 0.9 mA"],
+                warning: "ต้องถอดสายจั๊มเปอร์ออกก่อน แล้วนำแอมมิเตอร์มาต่อ <b>อนุกรม</b>"
+            },
+            ic: {
+                title: "จุดวัดกระแส IC (Collector Current)",
+                symbol: `<circle cx="50" cy="50" r="30" fill="none" stroke="#dc2626" stroke-width="4"/><text x="50" y="60" text-anchor="middle" font-size="24" font-weight="bold" fill="#dc2626">A</text>`,
+                func: "ตำแหน่งสำหรับแทรกแอมมิเตอร์เพื่อวัดกระแสโหลดหลักที่ไหลเข้าขา Collector",
+                data: ["Cut-off: IC ≈ 0 mA", "Saturation: IC ≈ 8-10 mA"],
+                warning: "ต้องถอดสายจั๊มเปอร์ออกก่อน แล้วนำแอมมิเตอร์มาต่อ <b>อนุกรม</b>"
+            },
+            vbe: {
+                title: "จุดวัดแรงดัน VBE (Base-Emitter Voltage)",
+                symbol: `<circle cx="50" cy="50" r="30" fill="none" stroke="#059669" stroke-width="4"/><text x="50" y="60" text-anchor="middle" font-size="24" font-weight="bold" fill="#059669">V</text>`,
+                func: "ตำแหน่งวัดความต่างศักย์ตกคร่อมรอยต่อระหว่างขา Base และ Emitter",
+                data: ["Cut-off: VBE ≈ 0 V", "Saturation: VBE ≈ 0.6 - 0.8 V"],
+                warning: "ต่อโวลต์มิเตอร์แบบ <b>ขนาน</b> (ขั้ว + ต่อจุดแดง, ขั้ว - ต่อจุดดำ)"
+            },
+            vce: {
+                title: "จุดวัดแรงดัน VCE (Collector-Emitter Voltage)",
+                symbol: `<circle cx="50" cy="50" r="30" fill="none" stroke="#059669" stroke-width="4"/><text x="50" y="60" text-anchor="middle" font-size="24" font-weight="bold" fill="#059669">V</text>`,
+                func: "ตำแหน่งวัดแรงดันตกคร่อมระหว่างขา Collector และ Emitter เพื่อตรวจเช็คสถานะการสวิตช์",
+                data: ["Cut-off: VCE ≈ 5.0 V", "Saturation: VCE ≈ 0.1 - 0.3 V"],
+                warning: "ต่อโวลต์มิเตอร์แบบ <b>ขนาน</b> (ขั้ว + ต่อจุดแดง, ขั้ว - ต่อจุดดำ)"
+            }
+        };
+
+        // Initialize Google Form Handlers
+        let gformLoadCount = 0;
+        function handleFormLoad() {
+            const loader = document.getElementById('formLoading');
+            if (loader) loader.style.display = 'none';
+            
+            gformLoadCount++;
+            // Forms reload the iframe on submission
+            if (gformLoadCount > 1) {
+                setTimeout(() => {
+                    closeGoogleForm();
+                    showMsgBox("เข้าสู่บทเรียน", "บันทึกข้อมูลเข้าใช้งานเรียบร้อยแล้ว ขอให้สนุกกับการเรียนรู้ชุดสาธิตครับ", "success");
+                }, 2000); 
+            }
+        }
+
+        function closeGoogleForm() {
+            const modal = document.getElementById('googleFormModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        let quizFormLoadCount = 0;
+        function openQuizForm() {
+            quizFormLoadCount = 0; 
+            const iframe = document.getElementById('quizIframe');
+            const loader = document.getElementById('quizFormLoading');
+            if(loader) loader.style.display = 'flex';
+            
+            // Reload the form to ensure a fresh session
+            iframe.src = "https://docs.google.com/forms/d/e/1FAIpQLSfFbGOdD5TpuWdYWvfdS7X6dsEPGVMrBXkyH1sHP79VLqlN5Q/viewform?embedded=true";
+            
+            const modal = document.getElementById('quizFormModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeQuizForm() {
+            const modal = document.getElementById('quizFormModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function handleQuizFormLoad() {
+            const loader = document.getElementById('quizFormLoading');
+            if (loader) loader.style.display = 'none';
+            
+            quizFormLoadCount++;
+            if (quizFormLoadCount > 1) {
+                setTimeout(() => {
+                    closeQuizForm();
+                    showMsgBox("ส่งคำตอบสำเร็จ", "บันทึกผลการทำแบบทดสอบประเมินความรู้ของคุณเรียบร้อยแล้ว ขอบคุณครับ", "success");
+                }, 2000);
+            }
+        }
+
+        window.onload = function() {
+            initChart();
+            changeMode('off');
+            renderQuiz();
+            
+            // Trigger Registration Form on load
+            const formModal = document.getElementById('googleFormModal');
+            if(formModal) {
+                formModal.classList.remove('hidden');
+                formModal.classList.add('flex');
+            }
+        };
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            const tabLearn = document.getElementById('tab-learn');
+            const tabMeasure = document.getElementById('tab-measure');
+            const contentLearn = document.getElementById('content-learn');
+            const contentMeasure = document.getElementById('content-measure');
+
+            if (tabId === 'learn') {
+                tabLearn.className = "flex items-center justify-center py-2.5 px-3 rounded-lg font-semibold text-xs transition duration-200 bg-cyan-600 text-white shadow-md shadow-cyan-600/30";
+                tabMeasure.className = "flex items-center justify-center py-2.5 px-3 rounded-lg font-semibold text-xs transition duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60";
+                contentLearn.classList.remove('hidden');
+                contentMeasure.classList.add('hidden');
+                isProbesConnected = false;
+                hideAllMeterGuides();
+            } else {
+                tabMeasure.className = "flex items-center justify-center py-2.5 px-3 rounded-lg font-semibold text-xs transition duration-200 bg-cyan-600 text-white shadow-md shadow-cyan-600/30";
+                tabLearn.className = "flex items-center justify-center py-2.5 px-3 rounded-lg font-semibold text-xs transition duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60";
+                contentMeasure.classList.remove('hidden');
+                contentLearn.classList.add('hidden');
+                isProbesConnected = false;
+                hideAllMeterGuides();
+                document.getElementById('measureFeedback').classList.add('hidden');
+            }
+        }
+
+        function updateLiveBadge(text, color) {
+            const badge = document.getElementById('circuitLiveBadge');
+            if (!badge) return;
+            if (color === 'red') {
+                badge.className = "hidden sm:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 text-xs font-semibold";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-400 animate-ping"></span><span id="badgeStateText">${text}</span>`;
+            } else if (color === 'emerald') {
+                badge.className = "hidden sm:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-semibold";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span><span id="badgeStateText">${text}</span>`;
+            } else if (color === 'purple') {
+                badge.className = "hidden sm:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/30 text-xs font-semibold";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span><span id="badgeStateText">${text}</span>`;
+            }
+        }
+
+        function showMsgBox(title, text, type = 'info') {
+            const box = document.getElementById('msgBox');
+            const icon = document.getElementById('msgIcon');
+            document.getElementById('msgTitle').innerText = title;
+            document.getElementById('msgText').innerHTML = text;
+            
+            if (type === 'success') {
+                icon.innerHTML = '<i class="fas fa-check-circle text-emerald-400"></i>';
+            } else if (type === 'error') {
+                icon.innerHTML = '<i class="fas fa-circle-xmark text-red-400"></i>';
+            } else if (type === 'warning') {
+                icon.innerHTML = '<i class="fas fa-triangle-exclamation text-amber-400"></i>';
+            } else {
+                icon.innerHTML = '<i class="fas fa-circle-info text-cyan-400"></i>';
+            }
+            
+            box.classList.remove('hidden');
+            box.classList.add('flex');
+        }
+
+        function closeMsgBox() {
+            document.getElementById('msgBox').classList.add('hidden');
+            document.getElementById('msgBox').classList.remove('flex');
+        }
+
+        function changeMode(mode) {
+            currentMode = mode;
+            clearInterval(pulseInterval); 
+            
+            document.querySelectorAll('input[name="inputMode"]').forEach(input => {
+                const label = input.closest('label');
+                const dot = label.querySelector('.mode-radio-dot div');
+                if(input.value === mode) {
+                    input.checked = true;
+                    label.classList.add('border-cyan-500/80', 'bg-cyan-950/20');
+                    label.classList.remove('border-slate-700');
+                    dot.className = "w-2 h-2 rounded-full bg-cyan-400";
+                } else {
+                    label.classList.remove('border-cyan-500/80', 'bg-cyan-950/20');
+                    label.classList.add('border-slate-700');
+                    dot.className = "w-2 h-2 rounded-full bg-transparent";
+                }
+            });
+
+            const toggleArm = document.getElementById('switch-arm');
+            const toggleArmInner = document.getElementById('switch-arm-inner');
+            const pulseControls = document.getElementById('pulseControls');
+
+            pulseControls.classList.add('hidden');
+
+            if (mode === 'off') {
+                toggleArm.setAttribute('x2', '285');
+                toggleArm.setAttribute('y2', '300');
+                toggleArmInner.setAttribute('x2', '285');
+                toggleArmInner.setAttribute('y2', '300');
+                setCircuitState(false);
+                updateStatusPanel("CUT-OFF (OFF)", "ไม่มีกระแส Base → Transistor ไม่นำกระแส → LED ดับ", "text-red-400", "bg-red-950/40", "border-red-500/30");
+                updateLiveBadge("Cut-off (OFF)", "red");
+                
+            } else if (mode === 'on') {
+                toggleArm.setAttribute('x2', '290');
+                toggleArm.setAttribute('y2', '250');
+                toggleArmInner.setAttribute('x2', '290');
+                toggleArmInner.setAttribute('y2', '250');
+                setCircuitState(true);
+                updateStatusPanel("SATURATION (ON)", "มีกระแส Base → Q1 นำกระแส → กระแส IC ไหล → LED ติด", "text-emerald-400", "bg-emerald-950/40", "border-emerald-500/30");
+                closeGraphModal();
+                updateLiveBadge("Saturation (ON)", "emerald");
+                
+            } else if (mode === 'pulse') {
+                toggleArm.setAttribute('x2', '290');
+                toggleArm.setAttribute('y2', '350');
+                toggleArmInner.setAttribute('x2', '290');
+                toggleArmInner.setAttribute('y2', '350');
+                pulseControls.classList.remove('hidden');
+                
+                pulseState = false;
+                startPulse();
+                updateLiveBadge("Pulse Switching", "purple");
+                setTimeout(() => openGraphModal(), 250);
+            }
+            
+            if(currentTab === 'measure' && isProbesConnected) {
+                performMeasurement(true);
+            }
+        }
+
+        function setCircuitState(isOn) {
+            const flowGroupOn = document.getElementById('currentFlowGroupOn');
+            const flowGroupPulse = document.getElementById('currentFlowGroupPulse');
+            const ledDome = document.getElementById('led-dome');
+            const ledRays = document.getElementById('led-rays');
+            const q1ActiveBadge = document.getElementById('q1ActiveBadge');
+            
+            if (isOn) {
+                if (currentMode === 'pulse') {
+                    if (flowGroupPulse) flowGroupPulse.classList.remove('hidden');
+                    if (flowGroupOn) flowGroupOn.classList.add('hidden');
+                } else {
+                    if (flowGroupOn) flowGroupOn.classList.remove('hidden');
+                    if (flowGroupPulse) flowGroupPulse.classList.add('hidden');
+                }
+
+                ledDome.classList.replace('led-off', 'led-on');
+                ledRays.classList.remove('hidden');
+                document.getElementById('q1Status').innerText = "Saturation (Closed)";
+                document.getElementById('q1Status').className = "font-bold font-mono text-emerald-400";
+                document.getElementById('ledStatus').innerText = "ON (สว่าง)";
+                document.getElementById('ledStatus').className = "font-bold font-mono text-emerald-400";
+                q1ActiveBadge.innerText = "Saturation";
+                q1ActiveBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 font-bold";
+                
+            } else {
+                if (flowGroupOn) flowGroupOn.classList.add('hidden');
+                if (flowGroupPulse) flowGroupPulse.classList.add('hidden');
+
+                ledDome.classList.replace('led-on', 'led-off');
+                ledRays.classList.add('hidden');
+                document.getElementById('q1Status').innerText = "Cut-off (Open)";
+                document.getElementById('q1Status').className = "font-bold font-mono text-red-400";
+                document.getElementById('ledStatus').innerText = "OFF (ดับ)";
+                document.getElementById('ledStatus').className = "font-bold font-mono text-red-400";
+                q1ActiveBadge.innerText = "Cut-off";
+                q1ActiveBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-red-500/20 text-red-400 font-bold";
+            }
+        }
+
+        function updateStatusPanel(status, desc, colorClass, bgClass, borderClass) {
+            const statusMsg = document.getElementById('statusMessage');
+            statusMsg.innerText = `วงจรอยู่ในสภาวะ ${status}`;
+            statusMsg.className = `text-center font-bold text-sm p-2.5 rounded-lg mb-2.5 border ${colorClass} ${bgClass} ${borderClass}`;
+            document.getElementById('statusDescription').innerText = desc;
+        }
+
+        function togglePulsePause() {
+            isPulsePaused = !isPulsePaused;
+            const btn1 = document.getElementById('pauseGraphBtn');
+            const btn2 = document.getElementById('modalPauseBtn');
+            const triggerBadge = document.getElementById('dsoTriggerState');
+            
+            if (isPulsePaused) {
+                btn1.innerHTML = '<i class="fas fa-play text-xs"></i> <span>เล่นต่อ</span>';
+                btn1.className = "flex-1 py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center justify-center gap-1";
+                if(btn2) {
+                    btn2.innerHTML = '<i class="fas fa-play text-xs"></i> <span>RUN</span>';
+                    btn2.className = "flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow transition text-xs flex items-center justify-center gap-2";
+                }
+                if(triggerBadge) {
+                    triggerBadge.innerText = "TRIGGER: STOPPED";
+                    triggerBadge.className = "text-amber-400 font-bold bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/40";
+                }
+            } else {
+                btn1.innerHTML = '<i class="fas fa-pause text-xs"></i> <span>หยุดชั่วคราว</span>';
+                btn1.className = "flex-1 py-1.5 px-3 bg-amber-600/80 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow transition flex items-center justify-center gap-1";
+                if(btn2) {
+                    btn2.innerHTML = '<i class="fas fa-pause text-xs"></i> <span>STOP</span>';
+                    btn2.className = "flex-1 sm:flex-none px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow transition text-xs flex items-center justify-center gap-2";
+                }
+                if(triggerBadge) {
+                    triggerBadge.innerText = "TRIGGER: AUTO";
+                    triggerBadge.className = "text-emerald-400 font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40";
+                }
+            }
+        }
+
+        function syncFrequency(val) {
+            val = Math.max(0.1, Math.min(10, parseFloat(val) || 1));
+            document.getElementById('freqSlider').value = val;
+            document.getElementById('freqInputText').value = val;
+            document.getElementById('modalFreqSlider').value = val;
+            updateFrequency(val);
+        }
+
+        function updateFrequency(val) {
+            pulseFrequency = parseFloat(val);
+            document.getElementById('modalFreqValue').innerText = `${pulseFrequency.toFixed(1)} Hz`;
+            document.getElementById('dsoFreqReadout').innerText = `FREQ: ${pulseFrequency.toFixed(2)} Hz`;
+            if (currentMode === 'pulse') {
+                clearInterval(pulseInterval);
+                startPulse();
+            }
+        }
+
+        function startPulse() {
+            const speedMs = 1000 / pulseFrequency;
+            updateStatusPanel("SWITCHING (PULSE)", "สัญญาณพัลส์ควบคุมการสวิตช์ความเร็วสูง", "text-purple-400", "bg-purple-950/40", "border-purple-500/30");
+            
+            pulseInterval = setInterval(() => {
+                if(isPulsePaused) return; 
+
+                pulseState = !pulseState;
+                setCircuitState(pulseState);
+                
+                if (chartInstance) {
+                    chartTime++;
+                    const value = pulseState ? 5 : 0;
+                    chartInstance.data.labels.push(chartTime);
+                    chartInstance.data.datasets[0].data.push(value);
+                    
+                    if (chartInstance.data.labels.length > 35) {
+                        chartInstance.data.labels.shift();
+                        chartInstance.data.datasets[0].data.shift();
+                    }
+                    chartInstance.update('none'); 
+                }
+                
+                if(currentTab === 'measure' && isProbesConnected) performMeasurement(true);
+
+            }, speedMs / 2); 
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('pulseGraphModal').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Vin (V)',
+                        data: [],
+                        borderColor: '#a855f7',
+                        backgroundColor: 'rgba(168, 85, 247, 0.15)',
+                        borderWidth: 2.5,
+                        stepped: true, 
+                        fill: true,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    scales: {
+                        y: { 
+                            min: -0.8, 
+                            max: 5.8, 
+                            ticks: { stepSize: 1, color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } },
+                            grid: { color: 'rgba(51, 65, 85, 0.4)' }
+                        },
+                        x: { 
+                            display: false,
+                            grid: { color: 'rgba(51, 65, 85, 0.3)' }
+                        }
+                    },
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { enabled: false } 
+                    }
+                }
+            });
+        }
+
+        function openGraphModal() {
+            if(currentMode !== 'pulse') return;
+            const modal = document.getElementById('graphModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            if(chartInstance) chartInstance.resize();
+        }
+
+        function closeGraphModal() {
+            const modal = document.getElementById('graphModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function setMeterMode(mode) {
+            measurementMode = mode;
+            isProbesConnected = false;
+            const btnV = document.getElementById('btnModeV');
+            const btnA = document.getElementById('btnModeA');
+            const lcdMode = document.getElementById('lcdModeIndicator');
+            const meterUnit = document.getElementById('meterUnit');
+
+            if (mode === 'voltage') {
+                btnV.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-cyan-600 text-white shadow";
+                btnA.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-slate-800 text-slate-300 hover:bg-slate-750";
+                lcdMode.innerText = "DC VOLT";
+                meterUnit.innerText = "V";
+            } else {
+                btnA.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-cyan-600 text-white shadow";
+                btnV.className = "py-2 px-3 rounded-lg text-xs font-bold font-mono transition bg-slate-800 text-slate-300 hover:bg-slate-750";
+                lcdMode.innerText = "DC CURR";
+                meterUnit.innerText = "mA";
+            }
+            document.getElementById('meterDisplay').innerText = "0.00";
+            document.getElementById('meterBar').style.width = "0%";
+            document.getElementById('measureFeedback').classList.add('hidden');
+            hideAllMeterGuides();
+        }
+
+        function selectTarget(target) {
+            currentSelectedTarget = target;
+            isProbesConnected = false;
+            ['VBE', 'VCE', 'IB', 'IC'].forEach(t => {
+                const btn = document.getElementById(`btnTarget-${t}`);
+                if (t === target) {
+                    btn.className = "py-2 px-2 text-xs font-bold rounded-lg border border-cyan-400 bg-cyan-500/20 text-cyan-300 shadow";
+                } else {
+                    btn.className = "py-2 px-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-750 text-slate-300 transition";
+                }
+            });
+            document.getElementById('meterDisplay').innerText = "0.00";
+            document.getElementById('meterBar').style.width = "0%";
+            document.getElementById('measureFeedback').classList.add('hidden');
+            hideAllMeterGuides();
+        }
+
+        function hideAllMeterGuides() {
+            document.getElementById('active-probes').classList.add('hidden');
+            document.getElementById('wire-ib-jumper').style.opacity = '1';
+            document.getElementById('wire-ic-jumper').style.opacity = '1';
+        }
+
+        function performMeasurement(isAuto = false) {
+            const target = currentSelectedTarget;
+            const display = document.getElementById('meterDisplay');
+            const feedback = document.getElementById('measureFeedback');
+            const meterBar = document.getElementById('meterBar');
+            
+            if (isAuto && !isProbesConnected) return;
+
+            if (!target && !isAuto) {
+                showMsgBox("แจ้งเตือน", "กรุณาเลือกตำแหน่งทดสอบ (Test Point) ที่ต้องการวัดก่อน แล้วกดปุ่มนำหัวโพรบไปจิ้มวัดค่า", "warning");
+                return;
+            }
+            if (!target) return;
+
+            if (measurementMode === 'voltage' && (target === 'IB' || target === 'IC')) {
+                isProbesConnected = false;
+                hideAllMeterGuides();
+                display.innerText = "Err";
+                meterBar.style.width = "100%";
+                feedback.classList.add('hidden');
+                if(!isAuto) {
+                    showMsgBox(
+                        "ผิดโหมดการวัด (Measurement Error)",
+                        `<div class="space-y-2 text-left">
+                            <p class="text-slate-200">ตำแหน่ง <strong>${target}</strong> เป็นการวัดกระแสไฟฟ้า ไม่สามารถใช้โหมดวัดแรงดันได้</p>
+                            <div class="bg-red-950/60 border border-red-500/40 p-2.5 rounded-lg text-red-200 text-xs">
+                                <strong><i class="fas fa-circle-info mr-1"></i> วิธีแก้ไขที่ถูกต้อง:</strong><br>
+                                1. ปรับโหมดเป็น <strong>DC Current (mA)</strong><br>
+                                2. แอมมิเตอร์ต้องต่อแบบ <strong>อนุกรม (Series)</strong> (ระบบจะจำลองการปลด Jumper)
+                            </div>
+                        </div>`,
+                        "error"
+                    );
+                }
+                return;
+            }
+            if (measurementMode === 'current' && (target === 'VBE' || target === 'VCE')) {
+                isProbesConnected = false;
+                hideAllMeterGuides();
+                display.innerText = "Err";
+                meterBar.style.width = "100%";
+                feedback.classList.add('hidden');
+                if(!isAuto) {
+                    showMsgBox(
+                        "ผิดโหมดการวัด (Measurement Error)",
+                        `<div class="space-y-2 text-left">
+                            <p class="text-slate-200">ตำแหน่ง <strong>${target}</strong> เป็นการวัดแรงดันตกคร่อม ไม่สามารถใช้โหมดวัดกระแสได้</p>
+                            <div class="bg-red-950/60 border border-red-500/40 p-2.5 rounded-lg text-red-200 text-xs">
+                                <strong><i class="fas fa-circle-info mr-1"></i> วิธีแก้ไขที่ถูกต้อง:</strong><br>
+                                1. ปรับโหมดเป็น <strong>DC Voltage (V)</strong><br>
+                                2. โวลต์มิเตอร์ต้องต่อแบบ <strong>ขนาน (Parallel)</strong> คร่อมจุดที่ต้องการวัด
+                            </div>
+                        </div>`,
+                        "error"
+                    );
+                }
+                return;
+            }
+
+            isProbesConnected = true;
+
+            hideAllMeterGuides();
+            if (target) {
+                const coords = probeCoords[target];
+                const probesGroup = document.getElementById('active-probes');
+                const probeRed = document.getElementById('probe-red-instance');
+                const probeBlack = document.getElementById('probe-black-instance');
+                
+                probesGroup.classList.remove('hidden');
+                probeRed.setAttribute('transform', `translate(${coords.rx}, ${coords.ry - 40})`);
+                probeBlack.setAttribute('transform', `translate(${coords.bx}, ${coords.by - 40})`);
+                
+                setTimeout(() => {
+                    probeRed.setAttribute('transform', `translate(${coords.rx}, ${coords.ry})`);
+                    probeBlack.setAttribute('transform', `translate(${coords.bx}, ${coords.by})`);
+                }, 30);
+
+                if (target === 'IB') document.getElementById('wire-ib-jumper').style.opacity = '0';
+                if (target === 'IC') document.getElementById('wire-ic-jumper').style.opacity = '0';
+            }
+
+            let val = 0.00;
+            let activeState = currentMode === 'pulse' ? pulseState : (currentMode === 'on');
+            const stateValues = activeState ? idealValues.on : idealValues.off;
+            
+            switch(target) {
+                case 'IB': val = stateValues.ib; break;
+                case 'IC': val = stateValues.ic; break;
+                case 'VBE': val = stateValues.vbe; break;
+                case 'VCE': val = stateValues.vce; break;
+            }
+
+            if (val > 0) {
+                val += val * 0.01 * (Math.random() - 0.5);
+            }
+
+            display.innerText = val.toFixed(2);
+            
+            const maxRef = measurementMode === 'voltage' ? 5.0 : 10.0;
+            const pct = Math.min(100, Math.max(0, (val / maxRef) * 100));
+            meterBar.style.width = `${pct}%`;
+            
+            if (!isAuto) {
+                feedback.classList.remove('hidden');
+                if (target === 'IB' || target === 'IC') {
+                    feedback.className = "rounded-xl p-3.5 border text-xs leading-relaxed bg-cyan-950/40 border-cyan-500/40 text-cyan-200";
+                    feedback.innerHTML = `<strong><i class="fas fa-check-circle mr-1"></i> โหมดวัดกระแส (${target}):</strong> เสียบสายแบบ <strong>อนุกรม</strong> (ถอดสายจั๊มเปอร์ออก)<br>ค่าที่อ่านได้: <span class="font-mono font-bold text-cyan-300 text-sm">${val.toFixed(2)} mA</span>`;
+                } else {
+                    feedback.className = "rounded-xl p-3.5 border text-xs leading-relaxed bg-emerald-950/40 border-emerald-500/40 text-emerald-200";
+                    feedback.innerHTML = `<strong><i class="fas fa-check-circle mr-1"></i> โหมดวัดแรงดัน (${target}):</strong> เสียบสายวัดคร่อมจุดแบบ <strong>ขนาน</strong><br>ค่าที่อ่านได้: <span class="font-mono font-bold text-emerald-300 text-sm">${val.toFixed(2)} V</span>`;
+                }
+            }
+        }
+
+        function checkRecords() {
+            const offLed = document.getElementById('rec-off-led').value;
+            const onLed = document.getElementById('rec-on-led').value;
+            const offVce = parseFloat(document.getElementById('rec-off-vce').value);
+            const onVce = parseFloat(document.getElementById('rec-on-vce').value);
+            
+            const feedback = document.getElementById('recordFeedback');
+            const compareContainer = document.getElementById('compareTableContainer');
+            feedback.classList.remove('hidden');
+
+            let isMostlyCorrect = true;
+            let msg = "";
+
+            if (offLed !== 'ดับ' || onLed !== 'สว่าง') {
+                isMostlyCorrect = false;
+                msg += "• สถานะ LED ยังไม่ถูกต้อง (OFF ต้องดับ, ON ต้องสว่าง)<br>";
+            }
+            if (isNaN(offVce) || offVce < 4.5 || offVce > 5.5) {
+                isMostlyCorrect = false;
+                msg += "• ค่า VCE สภาวะ OFF ควรมีค่าใกล้เคียง 5.0V (แรงดันแหล่งจ่าย)<br>";
+            }
+            if (isNaN(onVce) || onVce > 0.5) {
+                isMostlyCorrect = false;
+                msg += "• ค่า VCE สภาวะ ON ควรมีค่าต่ำมาก (< 0.5V ในสภาวะ Saturation)<br>";
+            }
+
+            if (isMostlyCorrect) {
+                feedback.className = "p-3 rounded-xl text-xs bg-emerald-950/50 text-emerald-300 border border-emerald-500/40 leading-relaxed";
+                feedback.innerHTML = "<strong><i class='fas fa-check-circle text-emerald-400'></i> ยอดเยี่ยมมาก!</strong> บันทึกผลได้ถูกต้องตามหลักการทำงาน ทฤษฎีเปรียบเทียบแสดงอยู่ด้านล่าง";
+                compareContainer.classList.remove('hidden');
+                setTimeout(() => {
+                    compareContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            } else {
+                compareContainer.classList.add('hidden');
+                feedback.className = "p-3 rounded-xl text-xs bg-amber-950/50 text-amber-200 border border-amber-500/40 leading-relaxed";
+                feedback.innerHTML = "<strong><i class='fas fa-triangle-exclamation text-amber-400'></i> ตรวจสอบค่าอีกครั้ง:</strong><br>" + msg + "แนะนำให้ทดลองวัดค่าในวงจรอีกครั้งเพื่อยืนยันคำตอบครับ";
+            }
+        }
+
+        function showInfo(componentKey) {
+            const info = componentInfo[componentKey];
+            if (!info) return;
+
+            document.getElementById('modalTitle').innerHTML = `<span>${info.title}</span>`;
+            document.getElementById('modalSymbol').innerHTML = info.symbol;
+            document.getElementById('modalFunction').innerHTML = info.func;
+            
+            const dataList = document.getElementById('modalData');
+            dataList.innerHTML = '';
+            info.data.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = item;
+                dataList.appendChild(li);
+            });
+
+            const warningBox = document.getElementById('modalWarningBox');
+            if (info.warning) {
+                warningBox.classList.remove('hidden');
+                document.getElementById('modalWarningText').innerHTML = info.warning;
+            } else {
+                warningBox.classList.add('hidden');
+            }
+
+            const modal = document.getElementById('infoModal');
+            const content = document.getElementById('infoModalContent');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 15);
+        }
+
+        function closeInfo() {
+            const modal = document.getElementById('infoModal');
+            const content = document.getElementById('infoModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 250);
+        }
+
+        function renderQuiz() {
+            const q = quizList[currentQuizIndex];
+            if (!q) return;
+
+            const badge = document.getElementById('quizBadge');
+            const questionEl = document.getElementById('quizQuestion');
+            const btn0 = document.getElementById('quizBtn0');
+            const btn1 = document.getElementById('quizBtn1');
+            const feedback = document.getElementById('quizFeedback');
+            const nextBtn = document.getElementById('quizNextBtn');
+            const dismissBtn = document.getElementById('quizDismissBtn');
+
+            if (badge) badge.innerText = `ข้อ ${currentQuizIndex + 1}/${quizList.length}`;
+            if (questionEl) questionEl.innerText = q.q;
+            
+            if (btn0 && q.options[0]) {
+                btn0.innerText = q.options[0];
+                btn0.className = "text-left px-3 py-2 text-xs bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-200 transition";
+            }
+            if (btn1 && q.options[1]) {
+                btn1.innerText = q.options[1];
+                btn1.className = "text-left px-3 py-2 text-xs bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-200 transition";
+            }
+            
+            if (feedback) {
+                feedback.classList.add('hidden');
+                feedback.innerHTML = '';
+            }
+            
+            if (nextBtn) {
+                nextBtn.classList.add('hidden');
+                nextBtn.classList.remove('inline-flex');
+            }
+
+            if (dismissBtn) {
+                dismissBtn.classList.add('hidden');
+                dismissBtn.classList.remove('inline-flex');
+            }
+        }
+
+        function answerQuiz(option) {
+            const feedback = document.getElementById('quizFeedback');
+            const dismissBtn = document.getElementById('quizDismissBtn');
+            const nextBtn = document.getElementById('quizNextBtn');
+            const q = quizList[currentQuizIndex];
+            
+            if (!q || !feedback) return;
+            feedback.classList.remove('hidden');
+
+            const btn0 = document.getElementById('quizBtn0');
+            const btn1 = document.getElementById('quizBtn1');
+            const chosenBtn = document.getElementById(`quizBtn${option}`);
+            
+            if (btn0) btn0.classList.remove('border-emerald-500', 'bg-emerald-950/40', 'border-red-500', 'bg-red-950/40', 'opacity-40');
+            if (btn1) btn1.classList.remove('border-emerald-500', 'bg-emerald-950/40', 'border-red-500', 'bg-red-950/40', 'opacity-40');
+            
+            if (option === q.correct) {
+                feedback.className = "mt-2 text-xs font-medium p-2.5 rounded-lg bg-emerald-950/60 text-emerald-300 border border-emerald-500/40";
+                feedback.innerHTML = `<i class='fas fa-check text-emerald-400 mr-1'></i> <strong>ถูกต้อง!</strong> ${q.feedbackCorrect}`;
+                
+                if (chosenBtn) chosenBtn.classList.add('border-emerald-500', 'bg-emerald-950/40');
+                const other = option === 0 ? 1 : 0;
+                const otherBtn = document.getElementById(`quizBtn${other}`);
+                if (otherBtn) otherBtn.classList.add('opacity-40');
+                
+                if (currentQuizIndex === quizList.length - 1) {
+                    if (dismissBtn) {
+                        dismissBtn.classList.remove('hidden');
+                        dismissBtn.classList.add('inline-flex');
+                    }
+                    if (nextBtn) {
+                        nextBtn.classList.add('hidden');
+                        nextBtn.classList.remove('inline-flex');
+                    }
+                } else {
+                    if (dismissBtn) {
+                        dismissBtn.classList.add('hidden');
+                        dismissBtn.classList.remove('inline-flex');
+                    }
+                    if (nextBtn) {
+                        nextBtn.classList.remove('hidden');
+                        nextBtn.classList.add('inline-flex');
+                    }
+                }
+            } else {
+                feedback.className = "mt-2 text-xs font-medium p-2.5 rounded-lg bg-red-950/60 text-red-300 border border-red-500/40";
+                feedback.innerHTML = `<i class='fas fa-times text-red-400 mr-1'></i> <strong>ยังไม่ถูกต้อง:</strong> ${q.feedbackWrong}`;
+                if (chosenBtn) chosenBtn.classList.add('border-red-500', 'bg-red-950/40');
+                if (nextBtn) {
+                    nextBtn.classList.add('hidden');
+                    nextBtn.classList.remove('inline-flex');
+                }
+            }
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuizIndex < quizList.length - 1) {
+                currentQuizIndex++;
+                renderQuiz();
+            }
+        }
+
+        function dismissQuiz() {
+            const quiz = document.getElementById('quizContainer');
+            if (quiz) {
+                quiz.classList.add('hidden');
+                quiz.classList.remove('flex');
+            }
+        }
+    </script>
+</body>
+</html>
